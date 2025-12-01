@@ -1,0 +1,1347 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ counsellor.user.get_full_name }} - MindEase{% endblock %}
+
+{% block extra_css %}
+<style>
+    .specialty-tag {
+        display: inline-block;
+        background-color: #e0e7ff;
+        color: var(--primary);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        margin-right: 6px;
+        margin-bottom: 6px;
+    }
+    
+    .rating-stars {
+        color: #fbbf24;
+    }
+    
+    .pulse-slow {
+        animation: pulse 4s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    /* Star rating system */
+    .star-rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+    }
+    
+    .star-rating input {
+        display: none;
+    }
+    
+    .star-rating label {
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        margin: 0 2px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23d1d5db' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'%3E%3C/polygon%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 24px;
+    }
+    
+    .star-rating input:checked ~ label,
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='%23fbbf24' stroke='%23fbbf24' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'%3E%3C/polygon%3E%3C/svg%3E");
+    }
+
+    /* Progress bars for rating distribution */
+    .progress-bar {
+        height: 8px;
+        background: #e5e7eb;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: var(--primary);
+    }
+
+    /* Modal styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .modal-content {
+        background: white;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 500px;
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .modal-overlay.active .modal-content {
+        transform: translateY(0);
+    }
+
+    /* Calendar styles */
+    .calendar-day {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .calendar-day:hover {
+        background: #e0e7ff;
+    }
+    
+    .calendar-day.selected {
+        background: var(--primary);
+        color: white;
+    }
+    
+    .calendar-day.disabled {
+        color: #9ca3af;
+        cursor: not-allowed;
+    }
+    
+    .calendar-day.disabled:hover {
+        background: transparent;
+    }
+
+    /* Time slot styles */
+    .time-slot {
+        padding: 10px 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .time-slot:hover {
+        border-color: var(--primary);
+        background: #f0f9ff;
+    }
+    
+    .time-slot.selected {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Django Messages -->
+{% if messages %}
+<div class="fixed top-20 right-4 z-50 space-y-2" id="messages-container">
+    {% for message in messages %}
+    <div class="bg-{% if message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-100 border border-{% if message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-400 text-{% if message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-800 px-6 py-4 rounded-lg shadow-lg max-w-md animate-slide-up" role="alert">
+        <div class="flex items-start">
+            <div class="flex-shrink-0">
+                {% if message.tags == 'error' %}
+                <i class="fas fa-exclamation-circle text-red-600"></i>
+                {% elif message.tags == 'warning' %}
+                <i class="fas fa-exclamation-triangle text-yellow-600"></i>
+                {% elif message.tags == 'success' %}
+                <i class="fas fa-check-circle text-green-600"></i>
+                {% else %}
+                <i class="fas fa-info-circle text-blue-600"></i>
+                {% endif %}
+            </div>
+            <div class="ml-3 flex-1">
+                <p class="text-sm font-medium">{{ message }}</p>
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" class="ml-3 flex-shrink-0">
+                <i class="fas fa-times text-slate-500 hover:text-slate-700"></i>
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<script>
+    // Auto-dismiss messages after 5 seconds
+    setTimeout(function() {
+        const messagesContainer = document.getElementById('messages-container');
+        if (messagesContainer) {
+            messagesContainer.style.opacity = '0';
+            messagesContainer.style.transition = 'opacity 0.5s ease';
+            setTimeout(function() {
+                messagesContainer.remove();
+            }, 500);
+        }
+    }, 5000);
+</script>
+{% endif %}
+
+<!-- Therapist Profile Header -->
+<section class="bg-white pt-24 pb-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row items-start md:items-center">
+            <!-- Therapist Image and Basic Info -->
+            <div class="flex items-start mb-6 md:mb-0 md:mr-8">
+                {% if counsellor.user.profile_picture %}
+                    <img src="{{ counsellor.user.profile_picture.url }}" 
+                         alt="{{ counsellor.user.get_full_name }}"
+                         class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover mr-4">
+                {% else %}
+                    <div class="w-24 h-24 md:w-32 md:h-32 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-2xl md:text-3xl font-bold mr-4">
+                        {{ counsellor.user.first_name|first }}{{ counsellor.user.last_name|first }}
+                    </div>
+                {% endif %}
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-slate-900">{{ counsellor.user.get_full_name }}</h1>
+                    <p class="text-slate-600 mt-1">{{ counsellor.get_license_type_display }} • {{ counsellor.years_experience }} years experience</p>
+                    <div class="flex items-center mt-2">
+                        <div class="rating-stars flex">
+                            {% with rating=counsellor.rating %}
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% elif forloop.counter|add:"-0.5" <= rating %}
+                                        <i class="fas fa-star-half-alt"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                        </div>
+                        <span class="text-slate-700 font-medium ml-2">{{ counsellor.rating }}</span>
+                        <span class="text-slate-500 ml-2">({{ counsellor.total_reviews }} reviews)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
+                {% if user.is_authenticated and user.role == 'client' %}
+                <button id="book-session-btn" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg flex items-center justify-center">
+                    <i class="fas fa-calendar-check mr-2"></i>
+                    Book Session
+                </button>
+                {% elif not user.is_authenticated %}
+                <a href="{% url 'login' %}?next={{ request.path }}" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg flex items-center justify-center">
+                    <i class="fas fa-sign-in-alt mr-2"></i>
+                    Login to Book
+                </a>
+                {% else %}
+                <div class="text-sm text-slate-600 bg-slate-100 px-4 py-2 rounded-lg">
+                    Only clients can book sessions.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content Area -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Left Column - Therapist Details -->
+        <div class="lg:w-2/3">
+            <!-- Specializations -->
+            <div class="bg-white rounded-xl p-6 shadow-sm mb-6 animate-slide-up">
+                <h2 class="text-xl font-semibold text-slate-800 mb-4">Specializations</h2>
+                <div class="flex flex-wrap">
+                    {% for spec in counsellor.specializations.all %}
+                        <span class="specialty-tag">{{ spec.name }}</span>
+                    {% empty %}
+                        <p class="text-slate-600">No specializations listed</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- About Section -->
+            <div class="bg-white rounded-xl p-6 shadow-sm mb-6 animate-slide-up">
+                <h2 class="text-xl font-semibold text-slate-800 mb-4">About {{ counsellor.user.first_name }}</h2>
+                <p class="text-slate-600 mb-4">
+                    {{ counsellor.about_me }}
+                </p>
+            </div>
+
+            <!-- Professional Experience -->
+            <div class="bg-white rounded-xl p-6 shadow-sm mb-6 animate-slide-up">
+                <h2 class="text-xl font-semibold text-slate-800 mb-4">Professional Experience</h2>
+                <p class="text-slate-600 whitespace-pre-line">{{ counsellor.professional_experience }}</p>
+            </div>
+
+            <!-- Qualifications & Experience -->
+            <div class="bg-white rounded-xl p-6 shadow-sm mb-6 animate-slide-up">
+                <h2 class="text-xl font-semibold text-slate-800 mb-4">Qualifications & Experience</h2>
+                <div class="space-y-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0 w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 mr-4">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-slate-800">Education</h3>
+                            <p class="text-slate-600">{{ counsellor.get_highest_degree_display }} - {{ counsellor.university }}</p>
+                            <p class="text-slate-600">Graduated: {{ counsellor.graduation_year }}</p>
+                        </div>
+                    </div>
+                    <div class="flex">
+                        <div class="flex-shrink-0 w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 mr-4">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-slate-800">Licenses & Certifications</h3>
+                            <p class="text-slate-600">{{ counsellor.get_license_type_display }}</p>
+                            <p class="text-slate-600">License Number: {{ counsellor.license_number }}</p>
+                            <p class="text-slate-600">Issued by: {{ counsellor.license_authority }}</p>
+                            {% if counsellor.certifications.all %}
+                                <p class="text-slate-600 mt-2 font-medium">Additional Certifications:</p>
+                                <ul class="text-slate-600 list-disc list-inside">
+                                    {% for cert in counsellor.certifications.all %}
+                                        <li>{{ cert.name }} - {{ cert.organization }} ({{ cert.year_obtained }})</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="flex">
+                        <div class="flex-shrink-0 w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 mr-4">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-slate-800">Experience Level</h3>
+                            <p class="text-slate-600">{{ counsellor.years_experience }} years of professional experience</p>
+                            <p class="text-slate-600">Total Sessions Conducted: {{ counsellor.total_sessions }}</p>
+                            <p class="text-slate-600">Total Clients Helped: {{ counsellor.total_clients }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="bg-white rounded-xl p-6 shadow-sm animate-slide-up">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-slate-800">Client Reviews</h2>
+                    {% if user.is_authenticated and user.role == 'client' %}
+                        {% if user_has_reviewed %}
+                        <button id="write-review-btn" class="bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-700 transition-colors">
+                            <i class="fas fa-edit mr-1"></i> Edit Your Review
+                        </button>
+                        {% else %}
+                        <button id="write-review-btn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">
+                            <i class="fas fa-plus mr-1"></i> Write a Review
+                        </button>
+                        {% endif %}
+                    {% elif not user.is_authenticated %}
+                    <a href="{% url 'login' %}" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">
+                        <i class="fas fa-sign-in-alt mr-1"></i> Login to Review
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- Review Summary -->
+                <div class="bg-slate-50 rounded-lg p-6 mb-6">
+                    <div class="flex flex-col md:flex-row items-center">
+                        <div class="text-center md:text-left mb-4 md:mb-0 md:mr-8">
+                            <div class="text-4xl font-bold text-slate-800">{{ counsellor.rating }}</div>
+                            <div class="rating-stars flex justify-center md:justify-start mt-1">
+                                {% with rating=counsellor.rating %}
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= rating %}
+                                            <i class="fas fa-star"></i>
+                                        {% elif forloop.counter|add:"-0.5" <= rating %}
+                                            <i class="fas fa-star-half-alt"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endwith %}
+                            </div>
+                            <div class="text-slate-600 text-sm mt-1">Based on {{ counsellor.total_reviews }} reviews</div>
+                        </div>
+                        <div class="flex-1 w-full">
+                            <!-- Rating Distribution -->
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <span class="text-sm text-slate-600 w-12">5 stars</span>
+                                    <div class="progress-bar flex-1 mx-2">
+                                        <div class="progress-fill" style="width: {{ rating_percentages.5 }}%"></div>
+                                    </div>
+                                    <span class="text-sm text-slate-600 w-8">{{ rating_percentages.5 }}%</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-sm text-slate-600 w-12">4 stars</span>
+                                    <div class="progress-bar flex-1 mx-2">
+                                        <div class="progress-fill" style="width: {{ rating_percentages.4 }}%"></div>
+                                    </div>
+                                    <span class="text-sm text-slate-600 w-8">{{ rating_percentages.4 }}%</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-sm text-slate-600 w-12">3 stars</span>
+                                    <div class="progress-bar flex-1 mx-2">
+                                        <div class="progress-fill" style="width: {{ rating_percentages.3 }}%"></div>
+                                    </div>
+                                    <span class="text-sm text-slate-600 w-8">{{ rating_percentages.3 }}%</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-sm text-slate-600 w-12">2 stars</span>
+                                    <div class="progress-bar flex-1 mx-2">
+                                        <div class="progress-fill" style="width: {{ rating_percentages.2 }}%"></div>
+                                    </div>
+                                    <span class="text-sm text-slate-600 w-8">{{ rating_percentages.2 }}%</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-sm text-slate-600 w-12">1 star</span>
+                                    <div class="progress-bar flex-1 mx-2">
+                                        <div class="progress-fill" style="width: {{ rating_percentages.1 }}%"></div>
+                                    </div>
+                                    <span class="text-sm text-slate-600 w-8">{{ rating_percentages.1 }}%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reviews List -->
+                <div id="reviews-container" class="space-y-6">
+                    {% if reviews %}
+                        {% for review in reviews %}
+                        <div class="bg-slate-50 rounded-lg p-4 animate-slide-up">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="font-medium text-slate-800">{{ review.title }}</h3>
+                                        {% if user.is_authenticated and user.client == review.client %}
+                                        <div class="flex space-x-2">
+                                            <button onclick="editReview({{ review.id }}, '{{ review.title }}', '{{ review.content|escapejs }}', {{ review.rating }})" class="text-indigo-600 hover:text-indigo-700 text-sm">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                            <form method="post" action="{% url 'delete_review' review.id %}" class="inline" onsubmit="return confirm('Are you sure you want to delete this review?');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="text-red-600 hover:text-red-700 text-sm">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex items-center mt-1">
+                                        <div class="flex mr-2">
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= review.rating %}
+                                                    <i class="fas fa-star text-amber-400"></i>
+                                                {% else %}
+                                                    <i class="far fa-star text-amber-400"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                        <span class="text-slate-600 text-sm">{{ review.created_at|timesince }} ago</span>
+                                        {% if not review.is_verified %}
+                                        <span class="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Pending Verification</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <span class="text-slate-600 text-sm ml-4">by {{ review.client.user.first_name }}</span>
+                            </div>
+                            <p class="text-slate-600">{{ review.content }}</p>
+                        </div>
+                        {% endfor %}
+                        
+                        <!-- Pagination for reviews -->
+                        {% if reviews.has_other_pages %}
+                        <div class="flex justify-center mt-6">
+                            <div class="flex space-x-2">
+                                {% if reviews.has_previous %}
+                                <a href="?reviews_page={{ reviews.previous_page_number }}" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                                {% endif %}
+                                
+                                <span class="px-4 py-2 bg-indigo-600 text-white rounded-lg">
+                                    Page {{ reviews.number }} of {{ reviews.paginator.num_pages }}
+                                </span>
+                                
+                                {% if reviews.has_next %}
+                                <a href="?reviews_page={{ reviews.next_page_number }}" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-slate-600 text-center py-8">No reviews yet. Be the first to review {{ counsellor.user.first_name }}!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Booking & Additional Info -->
+        <div class="lg:w-1/3">
+            <!-- Booking Card -->
+            <div class="bg-white rounded-xl p-6 shadow-sm top-24 animate-slide-up">
+                <h2 class="text-xl font-semibold text-slate-800 mb-4">Session Details</h2>
+                
+                <div class="space-y-4 mb-6">
+                    <div class="flex justify-between">
+                        <span class="text-slate-600">Session Fee</span>
+                        <span class="font-semibold text-slate-800">₹{{ counsellor.session_fee }} / session</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-600">Session Duration</span>
+                        <span class="font-semibold text-slate-800">50 minutes</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-600">Available Sessions</span>
+                        <span class="font-semibold text-slate-800">{{ counsellor.available_from|time:"g:i A" }} - {{ counsellor.available_to|time:"g:i A" }}</span>
+                    </div>
+                </div>
+
+                {% if user.is_authenticated and user.role == 'client' %}
+                <button id="sidebar-book-btn" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg flex items-center justify-center">
+                    <i class="fas fa-calendar-check mr-2"></i>
+                    Book Session
+                </button>
+                {% elif not user.is_authenticated %}
+                <a href="{% url 'login' %}?next={{ request.path }}" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg flex items-center justify-center">
+                    <i class="fas fa-sign-in-alt mr-2"></i>
+                    Login to Book
+                </a>
+                {% else %}
+                <div class="text-sm text-slate-600 bg-slate-100 px-4 py-2 rounded-lg text-center">
+                    Only clients can book sessions.
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Additional Information -->
+            <div class="bg-white rounded-xl p-6 shadow-sm mt-6 animate-slide-up">
+                <h2 class="text-xl font-semibold text-slate-800 mb-4">Additional Information</h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="font-medium text-slate-800 mb-2">Languages Spoken</h3>
+                        <div class="flex flex-wrap">
+                            {% for lang in counsellor.languages.all %}
+                                <span class="specialty-tag">{{ lang.name }}</span>
+                            {% empty %}
+                                <p class="text-slate-600 text-sm">Not specified</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="font-medium text-slate-800 mb-2">Therapy Approaches</h3>
+                        <ul class="text-slate-600 space-y-1">
+                            {% for approach in counsellor.therapy_approaches.all %}
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>{{ approach.name }}</span>
+                                </li>
+                            {% empty %}
+                                <li class="text-sm">Not specified</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="font-medium text-slate-800 mb-2">Age Groups Served</h3>
+                        <div class="flex flex-wrap">
+                            {% for age_group in counsellor.age_groups.all %}
+                                <span class="specialty-tag">{{ age_group.name }}</span>
+                            {% empty %}
+                                <p class="text-slate-600 text-sm">Not specified</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Booking Modal -->
+<div id="booking-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-semibold text-slate-800">Book a Session</h2>
+                <button id="close-booking-modal" class="text-slate-500 hover:text-slate-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Booking Steps -->
+            <div id="booking-steps" class="mb-6">
+                <!-- Step 1: Select Date -->
+                <div id="step-1" class="booking-step active">
+                    <h3 class="font-medium text-slate-800 mb-4">Select a Date</h3>
+                    <div id="calendar" class="mb-4">
+                        <!-- Calendar will be populated by JavaScript -->
+                    </div>
+                    <div class="flex justify-between">
+                        <button class="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-slate-300 transition-colors" disabled>Previous</button>
+                        <button id="next-to-time" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors">Next: Select Time</button>
+                    </div>
+                </div>
+                
+                <!-- Step 2: Select Time -->
+                <div id="step-2" class="booking-step hidden">
+                    <h3 class="font-medium text-slate-800 mb-4">Select a Time</h3>
+                    <div class="mb-4">
+                        <p class="text-slate-600 mb-2">Selected Date: <span id="selected-date" class="font-medium">Select a date</span></p>
+                        <div id="time-slots" class="grid grid-cols-3 gap-2">
+                            <!-- Time slots will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    <div class="flex justify-between">
+                        <button id="back-to-date" class="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-slate-300 transition-colors">Previous</button>
+                        <button id="next-to-confirm" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors">Next: Confirm</button>
+                    </div>
+                </div>
+                
+                <!-- Step 3: Confirm Booking -->
+                <div id="step-3" class="booking-step hidden">
+                    <h3 class="font-medium text-slate-800 mb-4">Confirm Your Booking</h3>
+                    <div class="bg-slate-50 rounded-lg p-4 mb-4">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-slate-600">Therapist</span>
+                            <span class="font-medium">{{ counsellor.user.get_full_name }}</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-slate-600">Date & Time</span>
+                            <span id="confirm-date-time" class="font-medium">Monday, October 16 at 10:00 AM</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-slate-600">Duration</span>
+                            <span class="font-medium">50 minutes</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-600">Session Fee</span>
+                            <span class="font-medium">₹{{ counsellor.session_fee }}</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="client-notes" class="block text-sm font-medium text-slate-700 mb-2">Notes for your counsellor (optional)</label>
+                        <textarea id="client-notes" rows="3" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Share anything you'd like {{ counsellor.user.first_name }} to know before the session"></textarea>
+                    </div>
+                    <div class="flex justify-between">
+                        <button id="back-to-time" class="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-slate-300 transition-colors">Previous</button>
+                        <button id="confirm-booking" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors">Confirm Booking</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Write Review Modal -->
+{% if user.is_authenticated and user.role == 'client' %}
+<div id="review-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-semibold text-slate-800" id="review-modal-title">
+                    {% if user_has_reviewed %}Edit Your Review{% else %}Write a Review{% endif %}
+                </h2>
+                <button id="close-review-modal" class="text-slate-500 hover:text-slate-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="review-form" method="post" action="{% if user_has_reviewed %}{% url 'edit_review' user_review.id %}{% else %}{% url 'submit_review' counsellor.user.id %}{% endif %}">
+                {% csrf_token %}
+                <input type="hidden" id="review-id" name="review_id" value="{% if user_review %}{{ user_review.id }}{% endif %}">
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Your Rating</label>
+                    <div class="star-rating" id="star-rating-input">
+                        <input type="radio" id="star5" name="rating" value="5" {% if user_review.rating == 5 %}checked{% endif %}>
+                        <label for="star5" title="5 stars"></label>
+                        <input type="radio" id="star4" name="rating" value="4" {% if user_review.rating == 4 %}checked{% endif %}>
+                        <label for="star4" title="4 stars"></label>
+                        <input type="radio" id="star3" name="rating" value="3" {% if user_review.rating == 3 %}checked{% endif %}>
+                        <label for="star3" title="3 stars"></label>
+                        <input type="radio" id="star2" name="rating" value="2" {% if user_review.rating == 2 %}checked{% endif %}>
+                        <label for="star2" title="2 stars"></label>
+                        <input type="radio" id="star1" name="rating" value="1" {% if user_review.rating == 1 %}checked{% endif %}>
+                        <label for="star1" title="1 star"></label>
+                    </div>
+                    <div class="error-message hidden mt-2 text-red-600 text-sm" id="rating-error">Please select a rating</div>
+                </div>
+                
+                <div class="mb-6">
+                    <label for="review-title" class="block text-sm font-medium text-slate-700 mb-2">Review Title</label>
+                    <input type="text" id="review-title" name="title" value="{% if user_review %}{{ user_review.title }}{% endif %}" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Summarize your experience" maxlength="200">
+                    <div class="error-message hidden mt-2 text-red-600 text-sm" id="title-error">Please enter a title for your review</div>
+                </div>
+                
+                <div class="mb-6">
+                    <label for="review-content" class="block text-sm font-medium text-slate-700 mb-2">Your Review</label>
+                    <textarea id="review-content" name="content" rows="5" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Share details of your experience with this therapist">{% if user_review %}{{ user_review.content }}{% endif %}</textarea>
+                    <div class="error-message hidden mt-2 text-red-600 text-sm" id="content-error">Please write your review</div>
+                </div>
+                
+                <div class="flex justify-end space-x-4">
+                    <button type="button" id="cancel-review" class="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-slate-300 transition-colors">Cancel</button>
+                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors">
+                        {% if user_has_reviewed %}Update Review{% else %}Submit Review{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    const bookingConfig = {
+        canBook: {% if user.is_authenticated and user.role == 'client' %}true{% else %}false{% endif %},
+        createUrl: "{% url 'bookings:create_booking' %}",
+        verifyUrl: "{% url 'bookings:verify_payment' %}",
+        failureUrl: "{% url 'bookings:payment_failed' %}",
+        redirectUrl: "{% url 'client_dashboard' %}",
+        counsellorId: {{ counsellor.user.id }},
+        loginUrl: "{% url 'login' %}?next={{ request.path|urlencode }}",
+        availabilityUrl: "{% url 'counsellor_public_availability' counsellor.user.id %}",
+        minBookDate: "{{ min_booking_date|date:'Y-m-d' }}",
+        bookingLeadTimeDays: {{ booking_lead_time_days }},
+    };
+
+    const bookingCalendarState = {
+        minDate: new Date(bookingConfig.minBookDate),
+        currentMonth: new Date(bookingConfig.minBookDate).getMonth(),
+        currentYear: new Date(bookingConfig.minBookDate).getFullYear(),
+    };
+
+    let bookingState = {
+        selectedDate: null,
+        selectedTimeDisplay: null,
+        selectedTimeInternal: null,
+        currentStep: 1,
+        sessionDuration: 50,
+        clientNotes: '',
+        availableSlots: []
+    };
+
+    const csrfToken = getCookie('csrftoken');
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize the page
+        setupCalendar();
+        setupTimeSlots();
+        
+        // Booking modal functionality
+        const bookingModal = document.getElementById('booking-modal');
+        const bookingButtons = document.querySelectorAll('#book-session-btn, #sidebar-book-btn');
+        const closeBookingModal = document.getElementById('close-booking-modal');
+        
+        // Open booking modal
+        if (bookingButtons.length && bookingConfig.canBook) {
+            bookingButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    bookingModal.classList.add('active');
+                    resetBookingState();
+                });
+            });
+        }
+        
+        // Close booking modal
+        closeBookingModal.addEventListener('click', function() {
+            bookingModal.classList.remove('active');
+        });
+        
+        // Booking modal steps navigation
+        document.getElementById('next-to-time').addEventListener('click', function() {
+            if (bookingState.selectedDate) {
+                navigateBookingStep(2);
+            } else {
+                alert('Please select a date first');
+            }
+        });
+        
+        document.getElementById('back-to-date').addEventListener('click', function() {
+            navigateBookingStep(1);
+        });
+        
+        document.getElementById('next-to-confirm').addEventListener('click', function() {
+            if (bookingState.selectedTimeInternal) {
+                navigateBookingStep(3);
+                updateConfirmationDetails();
+            } else {
+                alert('Please select a time slot first');
+            }
+        });
+        
+        document.getElementById('back-to-time').addEventListener('click', function() {
+            navigateBookingStep(2);
+        });
+        
+        // Confirm booking
+        document.getElementById('confirm-booking').addEventListener('click', function() {
+            initiateBooking();
+        });
+        
+        // Review modal functionality
+        const reviewModal = document.getElementById('review-modal');
+        const writeReviewBtn = document.getElementById('write-review-btn');
+        
+        if (writeReviewBtn && reviewModal) {
+            const closeReviewModal = document.getElementById('close-review-modal');
+            const cancelReviewBtn = document.getElementById('cancel-review');
+            const reviewForm = document.getElementById('review-form');
+            
+            writeReviewBtn.addEventListener('click', function() {
+                reviewModal.classList.add('active');
+            });
+            
+            closeReviewModal.addEventListener('click', function() {
+                reviewModal.classList.remove('active');
+            });
+            
+            cancelReviewBtn.addEventListener('click', function() {
+                reviewModal.classList.remove('active');
+            });
+            
+            // Review form submission with validation
+            reviewForm.addEventListener('submit', function(e) {
+                // Client-side validation
+                const rating = document.querySelector('input[name="rating"]:checked');
+                const title = document.getElementById('review-title').value.trim();
+                const content = document.getElementById('review-content').value.trim();
+                
+                let isValid = true;
+                
+                // Hide all error messages
+                document.querySelectorAll('.error-message').forEach(el => {
+                    el.classList.add('hidden');
+                });
+                
+                // Validate rating
+                if (!rating) {
+                    e.preventDefault();
+                    document.getElementById('rating-error').classList.remove('hidden');
+                    isValid = false;
+                }
+                
+                // Validate title
+                if (!title) {
+                    e.preventDefault();
+                    document.getElementById('title-error').classList.remove('hidden');
+                    isValid = false;
+                } else if (title.length > 200) {
+                    e.preventDefault();
+                    document.getElementById('title-error').textContent = 'Title must be less than 200 characters';
+                    document.getElementById('title-error').classList.remove('hidden');
+                    isValid = false;
+                }
+                
+                // Validate content
+                if (!content) {
+                    e.preventDefault();
+                    document.getElementById('content-error').classList.remove('hidden');
+                    isValid = false;
+                } else if (content.length < 10) {
+                    e.preventDefault();
+                    document.getElementById('content-error').textContent = 'Review must be at least 10 characters long';
+                    document.getElementById('content-error').classList.remove('hidden');
+                    isValid = false;
+                }
+                
+                // If validation passes, form will submit normally to Django
+            });
+        }
+        
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+        
+        // Close modals with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay').forEach(modal => {
+                    modal.classList.remove('active');
+                });
+            }
+        });
+    });
+
+    function initiateBooking() {
+        if (!bookingConfig.canBook) {
+            window.location.href = bookingConfig.loginUrl;
+            return;
+        }
+
+        if (!bookingState.selectedDate || !bookingState.selectedTimeInternal) {
+            showNotification('Please select a date and time before confirming.', 'info');
+            return;
+        }
+
+        bookingState.clientNotes = document.getElementById('client-notes').value.trim();
+
+        const payload = {
+            counsellor_id: bookingConfig.counsellorId,
+            session_date: formatDateForApi(bookingState.selectedDate),
+            session_time: bookingState.selectedTimeInternal,
+            session_duration: bookingState.sessionDuration,
+            client_notes: bookingState.clientNotes,
+        };
+
+        fetch(bookingConfig.createUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify(payload),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                launchRazorpayCheckout(data);
+            } else {
+                showNotification(data.error || 'Unable to initiate payment. Please try again.', 'error');
+            }
+        })
+        .catch(() => {
+            showNotification('Something went wrong while starting the payment. Please try again.', 'error');
+        });
+    }
+
+    function launchRazorpayCheckout(orderPayload) {
+        if (!orderPayload || !orderPayload.order || !orderPayload.order.id) {
+            showNotification('Invalid payment order. Please try again.', 'error');
+            return;
+        }
+    
+        console.log("Razorpay Key from backend:", orderPayload.razorpay_key);
+        console.log("Order Amount (in paise):", orderPayload.order.amount);
+        console.log("Order ID:", orderPayload.order.id);
+    
+        const options = {
+            key: orderPayload.razorpay_key,            // Your test/live key
+            amount: orderPayload.order.amount,         // in paise
+            currency: orderPayload.order.currency || 'INR',
+            name: 'MindEase',
+            description: `Session booking - ${orderPayload.booking.reference}`,
+            order_id: orderPayload.order.id,
+            prefill: {
+                name: orderPayload.client.name || '',
+                email: orderPayload.client.email || '',
+                contact: orderPayload.client.phone || '',
+            },
+            notes: {
+                booking_reference: orderPayload.booking.reference,
+            },
+            theme: {
+                color: '#4f46e5',
+            },
+            handler: function (response) {
+                // Called on successful payment
+                verifyPayment(orderPayload.booking.reference, response);
+            },
+            modal: {
+                ondismiss: function () {
+                    reportPaymentFailure(orderPayload.booking.reference, {
+                        description: 'Checkout dismissed by user'
+                    });
+                }
+            }
+        };
+    
+        try {
+            const rzp = new Razorpay(options);
+    
+            // Handle payment failures
+            rzp.on('payment.failed', function (response) {
+                console.error('Razorpay payment failed:', response);
+                const errorMsg = response.error?.description || 'Payment failed. Please try again.';
+                showNotification(`Payment failed: ${errorMsg}`, 'error');
+                reportPaymentFailure(orderPayload.booking.reference, response.error || { description: errorMsg });
+            });
+    
+            rzp.open();
+        } catch (error) {
+            console.error('Error initializing Razorpay:', error);
+            showNotification('Unable to open payment gateway. Please try again.', 'error');
+        }
+    }
+    
+    
+
+    function verifyPayment(bookingReference, razorpayResponse) {
+        const payload = {
+            booking_reference: bookingReference,
+            razorpay_order_id: razorpayResponse.razorpay_order_id,
+            razorpay_payment_id: razorpayResponse.razorpay_payment_id,
+            razorpay_signature: razorpayResponse.razorpay_signature,
+        };
+
+        fetch(bookingConfig.verifyUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify(payload),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Payment successful! Redirecting to your dashboard...', 'success');
+                setTimeout(() => window.location.href = bookingConfig.redirectUrl, 1200);
+            } else {
+                showNotification(data.error || 'Payment verification failed. Please contact support.', 'error');
+            }
+        })
+        .catch(() => {
+            showNotification('We could not verify the payment. Please contact support with your receipt.', 'error');
+        });
+    }
+
+    function reportPaymentFailure(bookingReference, error) {
+        fetch(bookingConfig.failureUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({
+                booking_reference: bookingReference,
+                error,
+            }),
+        });
+    }
+    
+    // Function to edit review - populate modal with existing data
+    function editReview(reviewId, title, content, rating) {
+        const reviewModal = document.getElementById('review-modal');
+        const reviewForm = document.getElementById('review-form');
+        const modalTitle = document.getElementById('review-modal-title');
+        
+        // Update form action to edit URL
+        reviewForm.action = `/review/${reviewId}/edit/`;
+        
+        // Update modal title
+        modalTitle.textContent = 'Edit Your Review';
+        
+        // Populate form fields
+        document.getElementById('review-title').value = title;
+        document.getElementById('review-content').value = content;
+        document.getElementById('review-id').value = reviewId;
+        
+        // Set rating
+        const ratingInput = document.querySelector(`input[name="rating"][value="${rating}"]`);
+        if (ratingInput) {
+            ratingInput.checked = true;
+        }
+        
+        // Update submit button text
+        const submitBtn = reviewForm.querySelector('button[type="submit"]');
+        submitBtn.textContent = 'Update Review';
+        
+        // Open modal
+        reviewModal.classList.add('active');
+    }
+    
+    // Setup calendar
+    function setupCalendar() {
+        renderCalendar();
+    }
+
+    function renderCalendar() {
+        const calendar = document.getElementById('calendar');
+        calendar.innerHTML = '';
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+        const { currentMonth, currentYear, minDate } = bookingCalendarState;
+        const monthStart = new Date(currentYear, currentMonth, 1);
+        const monthEnd = new Date(currentYear, currentMonth + 1, 0);
+
+        const header = document.createElement('div');
+        header.className = 'flex justify-between items-center mb-4';
+        header.innerHTML = `
+            <button id="prev-month" class="text-slate-500 hover:text-slate-700">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <h4 class="font-medium text-slate-800">${monthNames[currentMonth]} ${currentYear}</h4>
+            <button id="next-month" class="text-slate-500 hover:text-slate-700">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        `;
+        calendar.appendChild(header);
+
+        header.querySelector('#prev-month').addEventListener('click', () => changeCalendarMonth(-1));
+        header.querySelector('#next-month').addEventListener('click', () => changeCalendarMonth(1));
+
+        const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const daysHeader = document.createElement('div');
+        daysHeader.className = 'grid grid-cols-7 gap-1 mb-2';
+        daysOfWeek.forEach(day => {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'text-center text-sm font-medium text-slate-500 py-2';
+            dayElement.textContent = day;
+            daysHeader.appendChild(dayElement);
+        });
+        calendar.appendChild(daysHeader);
+
+        const grid = document.createElement('div');
+        grid.className = 'grid grid-cols-7 gap-1';
+
+        for (let i = 0; i < monthStart.getDay(); i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.className = 'h-10';
+            grid.appendChild(emptyCell);
+        }
+
+        for (let day = 1; day <= monthEnd.getDate(); day++) {
+            const cellDate = new Date(currentYear, currentMonth, day);
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day text-center text-sm font-medium';
+            dayElement.textContent = day;
+
+            if (bookingState.selectedDate &&
+                cellDate.toDateString() === bookingState.selectedDate.toDateString()) {
+                dayElement.classList.add('selected');
+            }
+
+            if (cellDate < minDate) {
+                dayElement.classList.add('disabled');
+            } else {
+                dayElement.addEventListener('click', function() {
+                    document.querySelectorAll('.calendar-day').forEach(day => day.classList.remove('selected'));
+                    this.classList.add('selected');
+                    bookingState.selectedDate = cellDate;
+                    bookingState.selectedTimeDisplay = null;
+                    bookingState.selectedTimeInternal = null;
+                    document.getElementById('selected-date').textContent = formatDate(cellDate);
+                    loadAvailableSlotsForDate(cellDate);
+                });
+            }
+
+            grid.appendChild(dayElement);
+        }
+
+        calendar.appendChild(grid);
+    }
+
+    function changeCalendarMonth(delta) {
+        const referenceDate = new Date(bookingCalendarState.currentYear, bookingCalendarState.currentMonth + delta, 1);
+        if (referenceDate < bookingCalendarState.minDate) {
+            return;
+        }
+        bookingCalendarState.currentMonth = referenceDate.getMonth();
+        bookingCalendarState.currentYear = referenceDate.getFullYear();
+        renderCalendar();
+    }
+    
+    function setupTimeSlots() {
+        renderTimeSlots([]);
+    }
+
+    function loadAvailableSlotsForDate(dateObj) {
+        const dateParam = formatDateForApi(dateObj);
+        bookingState.availableSlots = [];
+        bookingState.selectedTimeDisplay = null;
+        bookingState.selectedTimeInternal = null;
+        renderTimeSlots([]);
+
+        fetch(`${bookingConfig.availabilityUrl}?date=${dateParam}`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    renderTimeSlots([]);
+                    showNotification(data.error || 'Unable to fetch slots.', 'error');
+                    return;
+                }
+                bookingState.availableSlots = data.slots || [];
+                bookingState.sessionDuration = data.session_duration || bookingState.sessionDuration;
+                renderTimeSlots(bookingState.availableSlots);
+            })
+            .catch(() => {
+                renderTimeSlots([]);
+                showNotification('Unable to fetch slots. Please try again.', 'error');
+            });
+    }
+
+    function renderTimeSlots(slots) {
+        const container = document.getElementById('time-slots');
+        container.innerHTML = '';
+
+        if (!slots.length) {
+            const emptyState = document.createElement('div');
+            emptyState.className = 'col-span-3 text-center text-sm text-slate-500 py-4';
+            emptyState.textContent = bookingState.selectedDate ? 'No slots available for this date.' : 'Select a date to see available times.';
+            container.appendChild(emptyState);
+            return;
+        }
+
+        slots.forEach(slot => {
+            const slotElement = document.createElement('div');
+            slotElement.className = 'time-slot';
+            slotElement.textContent = formatDisplayTime(slot.start_time);
+            slotElement.addEventListener('click', function() {
+                document.querySelectorAll('.time-slot').forEach(el => el.classList.remove('selected'));
+                this.classList.add('selected');
+                bookingState.selectedTimeDisplay = formatDisplayTime(slot.start_time);
+                bookingState.selectedTimeInternal = slot.start_time;
+            });
+            container.appendChild(slotElement);
+        });
+    }
+    
+    // Navigate booking steps
+    function navigateBookingStep(step) {
+        // Hide all steps
+        document.querySelectorAll('.booking-step').forEach(stepEl => {
+            stepEl.classList.add('hidden');
+        });
+        
+        // Show current step
+        document.getElementById(`step-${step}`).classList.remove('hidden');
+        
+        // Update current step
+        bookingState.currentStep = step;
+    }
+    
+    // Reset booking state
+    function resetBookingState() {
+        bookingState = {
+            selectedDate: null,
+            selectedTimeDisplay: null,
+            selectedTimeInternal: null,
+            currentStep: 1,
+            sessionDuration: 50,
+            clientNotes: '',
+            availableSlots: []
+        };
+        
+        bookingCalendarState.currentMonth = bookingCalendarState.minDate.getMonth();
+        bookingCalendarState.currentYear = bookingCalendarState.minDate.getFullYear();
+        renderCalendar();
+        renderTimeSlots([]);
+        document.getElementById('selected-date').textContent = 'Select a date';
+
+        navigateBookingStep(1);
+    }
+    
+    // Update confirmation details
+    function updateConfirmationDetails() {
+        const confirmDateTime = document.getElementById('confirm-date-time');
+        confirmDateTime.textContent = formatBookingDateTime();
+    }
+    
+    // Format date for display
+    function formatDate(date) {
+        const options = { weekday: 'long', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+    }
+    
+    // Format booking date and time for display
+    function formatBookingDateTime() {
+        if (bookingState.selectedDate && bookingState.selectedTimeDisplay) {
+            return `${formatDate(bookingState.selectedDate)} at ${bookingState.selectedTimeDisplay}`;
+        }
+        return '';
+    }
+
+    function formatDateForApi(dateObj) {
+        if (!dateObj) return null;
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    function to24HourFormat(timeString) {
+        const [time, period] = timeString.split(' ');
+        let [hours, minutes] = time.split(':').map(Number);
+
+        if (period === 'PM' && hours !== 12) {
+            hours += 12;
+        }
+        if (period === 'AM' && hours === 12) {
+            hours = 0;
+        }
+
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    }
+
+    function formatDisplayTime(timeString) {
+        const [hoursStr, minutesStr] = timeString.split(':');
+        let hours = parseInt(hoursStr, 10);
+        const minutes = parseInt(minutesStr, 10);
+        const period = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12;
+        return `${hours}:${String(minutes).padStart(2, '0')} ${period}`;
+    }
+
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    function showNotification(message, type = 'info') {
+        const existing = document.querySelectorAll('.notification');
+        existing.forEach(el => el.remove());
+
+        const colors = {
+            success: '#16a34a',
+            error: '#dc2626',
+            info: '#4f46e5',
+        };
+
+        const icon = {
+            success: 'fa-check-circle',
+            error: 'fa-exclamation-circle',
+            info: 'fa-info-circle',
+        };
+
+        const notification = document.createElement('div');
+        notification.className = 'notification fixed top-4 right-4 text-white px-4 py-3 rounded-lg shadow-lg z-50';
+        notification.style.background = colors[type] || colors.info;
+        notification.innerHTML = `
+            <div class="flex items-center gap-2">
+                <i class="fas ${icon[type] || icon.info}"></i>
+                <span class="font-medium">${message}</span>
+            </div>
+        `;
+        document.body.appendChild(notification);
+
+        setTimeout(() => notification.remove(), 3500);
+    }
+</script>
+{% endblock %}

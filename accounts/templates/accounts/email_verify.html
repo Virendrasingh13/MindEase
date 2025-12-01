@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email - MindEase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #06b6d4;
+            --accent: #8b5cf6;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --text: #475569;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .animate-slide-up {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideUp 0.6s ease forwards;
+        }
+        
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in {
+            opacity: 0;
+            animation: fadeIn 0.8s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .btn-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Loader Styles */
+        .form-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .loader-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loader-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            text-align: center;
+            min-width: 320px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .loader-text {
+            margin-top: 1.5rem;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .countdown {
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .error-message {
+            color: var(--error);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Content -->
+    <div class="max-w-2xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
+        <div class="flex flex-col min-h-[600px]">
+            <!-- Header Section -->
+            <div class="bg-gradient-to-br from-indigo-600 to-purple-700 text-white p-8 text-center">
+                <a href="/" class="inline-flex items-center text-white mb-6 animate-slide-up">
+                    <div class="h-10 w-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center mr-3">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <span class="text-xl font-bold">MindEase</span>
+                </a>
+                
+                <div class="w-24 h-24 mx-auto bg-white bg-opacity-20 rounded-full flex items-center justify-center mb-6">
+                    <div class="w-16 h-16 bg-white bg-opacity-30 rounded-full flex items-center justify-center">
+                        <i class="fas fa-envelope-open-text text-white text-3xl"></i>
+                    </div>
+                </div>
+                
+                <h1 class="text-3xl font-bold mb-4 animate-slide-up">Verify Your Email</h1>
+                <p class="text-indigo-100 max-w-md mx-auto animate-fade-in">Complete your registration by verifying your email address</p>
+            </div>
+            
+            <!-- Content Section -->
+            <div class="flex-1 p-8 lg:p-12">
+                <div class="max-w-md mx-auto">
+                    <!-- Email Display -->
+                    <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-6 mb-8 text-center animate-slide-up">
+                        <i class="fas fa-envelope text-indigo-600 text-2xl mb-3"></i>
+                        <p class="text-indigo-800 font-medium">Verification email sent to:</p>
+                        <p class="text-indigo-600 mt-1 font-semibold" id="user-email">{{ email }}</p>
+                    </div>
+                    
+                    <!-- Instructions -->
+                    <div class="bg-slate-50 rounded-xl p-6 mb-8 animate-slide-up">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-4">Follow these steps:</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-slate-700 font-medium">Check your inbox</p>
+                                    <p class="text-slate-600 text-sm mt-1">Look for an email from MindEase</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-slate-700 font-medium">Click the verification link</p>
+                                    <p class="text-slate-600 text-sm mt-1">This will confirm your email address</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-slate-700 font-medium">Start your journey</p>
+                                    <p class="text-slate-600 text-sm mt-1">Access all MindEase features</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Resend Email Section -->
+                    <div class="bg-slate-50 rounded-xl p-6 mb-8 animate-slide-up">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-4">Didn't receive the email?</h3>
+                        
+                        <div class="space-y-3 mb-6">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-search text-slate-500 mt-1"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-slate-700 text-sm">Check your spam or junk folder</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-clock text-slate-500 mt-1"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-slate-700 text-sm">Wait a few minutes - emails can be delayed</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-envelope text-slate-500 mt-1"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-slate-700 text-sm">Make sure you entered the correct email</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-6 border-t border-slate-200">
+                            <button id="resend-btn" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium btn-hover">
+                                <i class="fas fa-paper-plane mr-2"></i> Resend Verification Email
+                            </button>
+                            <div class="text-center mt-3">
+                                <p class="text-slate-600 text-sm">You can resend in <span id="countdown" class="font-semibold countdown">60</span> seconds</p>
+                            </div>
+                            <div class="error-message text-center mt-2" id="resend-error"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Support Section -->
+                    <div class="text-center animate-fade-in">
+                        <p class="text-slate-600">Already verify an email? <a href="/accounts/login/" class="text-indigo-600 font-medium hover:text-indigo-500">Login here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 animate-slide-up">
+            <div class="flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mx-auto mb-4">
+                <i class="fas fa-check text-green-600 text-2xl"></i>
+            </div>
+            
+            <h3 class="text-xl font-bold text-slate-800 text-center mb-2">Email Sent Successfully!</h3>
+            <p class="text-slate-600 text-center mb-6">We've sent a new verification link to your email address. Please check your inbox.</p>
+            
+            <div class="flex space-x-4">
+                <button id="go-to-home" class="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium btn-hover">
+                    Go to Login Page
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loader -->
+    <div id="form-loader" class="form-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <div class="loader-text">Sending verification email...</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get CSRF token function
+            function getCSRFToken() {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, 'csrftoken'.length + 1) === ('csrftoken' + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring('csrftoken'.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            // DOM Elements
+            const resendBtn = document.getElementById('resend-btn');
+            const countdownElement = document.getElementById('countdown');
+            const userEmailElement = document.getElementById('user-email');
+            const successModal = document.getElementById('success-modal');
+            const goToHomeBtn = document.getElementById('go-to-home');
+            const formLoader = document.getElementById('form-loader');
+            const resendError = document.getElementById('resend-error');
+
+            // Get user email from the template
+            const userEmail = userEmailElement.textContent;
+
+            // Countdown timer for resend button
+            let countdown = parseInt(localStorage.getItem('resend_countdown') || '60');
+            let countdownInterval;
+
+            function updateResendButton() {
+                if (countdown > 0) {
+                    resendBtn.disabled = true;
+                    resendBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                    resendBtn.classList.add('bg-slate-400', 'cursor-not-allowed');
+                    countdownElement.textContent = countdown;
+                } else {
+                    resendBtn.disabled = false;
+                    resendBtn.classList.remove('bg-slate-400', 'cursor-not-allowed');
+                    resendBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+                    countdownElement.textContent = '0';
+                    clearInterval(countdownInterval);
+                }
+            }
+
+            function startCountdown() {
+                countdown = 60;
+                localStorage.setItem('resend_countdown', countdown.toString());
+                updateResendButton();
+                
+                countdownInterval = setInterval(() => {
+                    countdown--;
+                    localStorage.setItem('resend_countdown', countdown.toString());
+                    updateResendButton();
+                }, 1000);
+            }
+
+            // Initialize countdown
+            updateResendButton();
+            if (countdown > 0) {
+                countdownInterval = setInterval(() => {
+                    countdown--;
+                    localStorage.setItem('resend_countdown', countdown.toString());
+                    updateResendButton();
+                }, 1000);
+            }
+
+            // Resend button functionality
+            resendBtn.addEventListener('click', function() {
+                if (!resendBtn.disabled) {
+                    // Show loader
+                    formLoader.style.display = 'flex';
+                    hideError('resend-error');
+
+                    // Send resend request
+                    fetch('/accounts/resend-verification/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCSRFToken(),
+                        },
+                        body: JSON.stringify({
+                            email: userEmail
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Hide loader
+                        formLoader.style.display = 'none';
+
+                        if (data.success) {
+                            // Show success modal
+                            successModal.classList.remove('hidden');
+                            // Start countdown
+                            startCountdown();
+                        } else {
+                            showError('resend-error', data.error || 'Failed to send verification email');
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        formLoader.style.display = 'none';
+                        showError('resend-error', 'Network error. Please try again.');
+                    });
+                }
+            });
+
+            // Go to home page button
+            goToHomeBtn.addEventListener('click', function() {
+                // Clear local storage
+                localStorage.removeItem('resend_countdown');
+                // Redirect to home page
+                window.location.href = '/accounts/login/';
+            });
+
+            // Error handling functions
+            function showError(elementId, message) {
+                const errorElement = document.getElementById(elementId);
+                if (errorElement) {
+                    errorElement.textContent = message;
+                    errorElement.style.display = 'block';
+                }
+            }
+
+            function hideError(elementId) {
+                const errorElement = document.getElementById(elementId);
+                if (errorElement) {
+                    errorElement.style.display = 'none';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

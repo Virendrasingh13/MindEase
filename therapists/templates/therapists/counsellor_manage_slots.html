@@ -1,0 +1,444 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="slot-management-container">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Manage Your Weekly Availability</h1>
+      <p class="text-slate-600 mt-2">Set your available time slots for the week. Clients will see these when booking sessions.</p>
+    </div>
+
+    <!-- Settings & Controls -->
+    <div class="full-width-settings mt-6">
+      <h2 class="settings-title"><i class="fas fa-cog"></i> Session Settings</h2>
+
+      <div class="settings-grid grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        <!-- Session Duration (kept for stats, not required for manual slots) -->
+        
+      </div>
+
+      <!-- Manual slot creation controls -->
+      <div class="manual-slot-controls bg-white p-4 rounded-lg shadow-sm mt-4 flex flex-col md:flex-row md:items-center gap-3">
+        <div class="flex items-center gap-2">
+          <label class="text-sm">Start</label>
+          <input id="manual-start" type="time" class="px-2 py-1 border rounded" />
+        </div>
+        <div class="flex items-center gap-2">
+          <label class="text-sm">End</label>
+          <input id="manual-end" type="time" class="px-2 py-1 border rounded" />
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="manual-day" class="px-2 py-1 border rounded">
+            <!-- will be filled by JS with this week's dates -->
+          </select>
+        </div>
+        <div class="flex items-center gap-2 ml-auto">
+          <button id="add-slot" class="btn btn-primary px-4 py-2">Add Slot</button>
+        </div>
+      </div>
+
+      <!-- Profile Visibility & Quick Actions -->
+      <div class="flex items-center justify-between mt-4">
+        <div class="visibility-section flex items-center gap-4">
+          <label class="flex items-center gap-2">
+            <input type="checkbox" id="profile-visibility" {% if counsellor.is_available %}checked{% endif %} />
+            <span>Profile Visible for Booking</span>
+          </label>
+        </div>
+
+        <div class="quick-actions flex gap-2">
+          <button id="select-all-today" class="quick-action-btn px-3 py-2 border rounded">Select All Today</button>
+          <button id="clear-all-today" class="quick-action-btn px-3 py-2 border rounded">Clear All Today</button>
+          <button id="copy-to-week" class="quick-action-btn px-3 py-2 border rounded">Copy Today to Week</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="full-width-calendar mt-6 bg-white p-4 rounded-lg shadow-sm">
+      <div class="calendar-header flex items-center justify-between mb-3">
+        <div class="flex items-center gap-3">
+          <h2 class="calendar-title text-lg font-medium"><i class="fas fa-calendar-week mr-2"></i>Weekly Schedule</h2>
+          <div class="week-navigation flex items-center gap-2">
+            <button id="prev-week" class="nav-btn px-2 py-1 border rounded"><i class="fas fa-chevron-left"></i></button>
+            <div id="current-week-range" class="font-medium">Week</div>
+            <button id="next-week" class="nav-btn px-2 py-1 border rounded"><i class="fas fa-chevron-right"></i></button>
+          </div>
+        </div>
+        <div class="text-sm text-slate-600">Click a slot to remove it. Click &amp; hold not required.</div>
+      </div>
+
+      <div id="calendar-grid" class="calendar-grid grid grid-cols-7 gap-2"></div>
+    </div>
+
+    <!-- Summary -->
+    <div class="full-width-summary mt-6 bg-white p-4 rounded-lg shadow-sm">
+      <div class="summary-header flex items-center justify-between">
+        <h2 class="summary-title font-medium text-lg"><i class="fas fa-chart-bar mr-2"></i>Availability Summary</h2>
+        <div class="action-buttons flex gap-2">
+          <button id="reset-slots" class="btn btn-secondary px-3 py-1 border rounded">Reset</button>
+          <button id="save-slots" class="btn btn-primary px-3 py-1">Save Availability</button>
+        </div>
+      </div>
+
+      <div class="stats-grid grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+        <div class="stat-card p-3 border rounded">
+          <div class="stat-value text-2xl font-semibold" id="total-hours">0</div>
+          <div class="stat-label text-sm text-slate-500">Total Hours</div>
+        </div>
+        <div class="stat-card p-3 border rounded">
+          <div class="stat-value text-2xl font-semibold" id="total-sessions">0</div>
+          <div class="stat-label text-sm text-slate-500">Available Sessions</div>
+        </div>
+        <div class="stat-card p-3 border rounded">
+          <div class="stat-value text-2xl font-semibold" id="average-daily">0</div>
+          <div class="stat-label text-sm text-slate-500">Average Daily</div>
+        </div>
+        <div class="stat-card p-3 border rounded">
+          <div class="stat-value text-2xl font-semibold" id="busiest-day">-</div>
+          <div class="stat-label text-sm text-slate-500">Busiest Day</div>
+        </div>
+      </div>
+
+      <div class="day-distribution mt-4">
+        <h3 class="distribution-title font-medium">Weekly Distribution</h3>
+        <div id="day-distribution-grid" class="grid grid-cols-7 gap-2 mt-2"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div id="success-modal" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+  <div class="modal-content bg-white rounded-lg p-6 w-96">
+    <h2 class="text-xl font-semibold mb-2">Availability Updated!</h2>
+    <p class="text-slate-600 mb-4">Your weekly schedule has been successfully saved.</p>
+    <div class="flex justify-end">
+      <button id="close-success-modal" class="btn btn-primary px-3 py-1">Continue</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---- Configuration injected from Django ----
+const manageAvailabilityConfig = {
+    fetchUrl: "{% url 'counsellor_availability_api' %}",
+    saveUrl: "{% url 'counsellor_availability_api' %}",
+    initialSessionDuration: {{ counsellor.default_session_duration|default:45 }},
+    initialBreakDuration: {{ counsellor.default_break_duration|default:5 }},
+    initialStartTime: "{{ counsellor.available_from|time:'H:i' }}",
+    initialEndTime: "{{ counsellor.available_to|time:'H:i' }}",
+    profileVisible: {% if counsellor.is_available %}true{% else %}false{% endif %}
+};
+
+// ---- Global state ----
+const csrfToken = getCookie('csrftoken');
+const state = {
+    sessionDuration: manageAvailabilityConfig.initialSessionDuration || 45,
+    breakDuration: manageAvailabilityConfig.initialBreakDuration || 5,
+    selectedSlots: {}, // { "2025-12-01|09:00": {date, start, end} }
+    currentWeek: new Date(),
+    profileVisible: manageAvailabilityConfig.profileVisible,
+};
+
+// ---- Init ----
+document.addEventListener('DOMContentLoaded', function() {
+    initControls();
+    renderWeekOptions();
+    renderCalendar();
+    fetchAvailabilityForWeek();
+});
+
+// ---- Helpers ----
+function formatDateIso(d){
+    const year = d.getFullYear();
+    const month = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    return `${year}-${month}-${day}`;
+}
+function parseTime(t){ // 'HH:MM' -> {h,m}
+    if(!t) return null;
+    const [hh,mm] = t.split(':').map(Number);
+    return {h:hh,m:mm};
+}
+function formatDisplay(t){
+    if(!t) return '';
+    const [hh,mm] = t.split(':').map(Number);
+    const period = hh >= 12 ? 'PM' : 'AM';
+    const h = hh % 12 || 12;
+    return `${h}:${String(mm).padStart(2,'0')} ${period}`;
+}
+function getWeekStart(d){
+    const res = new Date(d);
+    const day = res.getDay();
+    const diff = (day === 0) ? -6 : 1 - day; // Monday as start
+    res.setDate(res.getDate() + diff);
+    res.setHours(0,0,0,0);
+    return res;
+}
+function getWeekDays(d){
+    const start = getWeekStart(d);
+    const arr = [];
+    for(let i=0;i<7;i++){
+        const day = new Date(start);
+        day.setDate(start.getDate()+i);
+        arr.push({date: formatDateIso(day), label: day.toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'})});
+    }
+    return arr;
+}
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
+// ---- UI Initialization ----
+function initControls(){
+    document.getElementById('add-slot').addEventListener('click', onAddManualSlot);
+    document.getElementById('select-all-today').addEventListener('click', onSelectAllToday);
+    document.getElementById('clear-all-today').addEventListener('click', onClearAllToday);
+    document.getElementById('copy-to-week').addEventListener('click', onCopyToWeek);
+    document.getElementById('prev-week').addEventListener('click', ()=>{ state.currentWeek.setDate(state.currentWeek.getDate()-7); renderWeekOptions(); renderCalendar(); fetchAvailabilityForWeek(); });
+    document.getElementById('next-week').addEventListener('click', ()=>{ state.currentWeek.setDate(state.currentWeek.getDate()+7); renderWeekOptions(); renderCalendar(); fetchAvailabilityForWeek(); });
+    document.getElementById('reset-slots').addEventListener('click', ()=>{ fetchAvailabilityForWeek(); showNotification('Changes discarded'); });
+    document.getElementById('save-slots').addEventListener('click', onSaveSlots);
+    document.getElementById('close-success-modal').addEventListener('click', ()=>{ document.getElementById('success-modal').classList.add('hidden'); });
+
+    // Option selectors
+    document.querySelectorAll('#session-duration-options .option-card').forEach(card=>{
+        card.addEventListener('click', ()=>{
+            document.querySelectorAll('#session-duration-options .option-card').forEach(c=>c.classList.remove('selected'));
+            card.classList.add('selected');
+            state.sessionDuration = parseInt(card.dataset.value,10);
+            renderCalendar(); updateSummary();
+        });
+    });
+    document.querySelectorAll('#break-duration-options .option-card').forEach(card=>{
+        card.addEventListener('click', ()=>{
+            document.querySelectorAll('#break-duration-options .option-card').forEach(c=>c.classList.remove('selected'));
+            card.classList.add('selected');
+            state.breakDuration = parseInt(card.dataset.value,10);
+            renderCalendar(); updateSummary();
+        });
+    });
+
+    document.getElementById('profile-visibility').addEventListener('change', (e)=>{ state.profileVisible = e.target.checked; });
+}
+
+// ---- Week dropdown for manual-day selector ----
+function renderWeekOptions(){
+    const sel = document.getElementById('manual-day');
+    sel.innerHTML = '';
+    const days = getWeekDays(state.currentWeek);
+    days.forEach(d=>{
+        const opt = document.createElement('option');
+        opt.value = d.date;
+        opt.textContent = d.label;
+        sel.appendChild(opt);
+    });
+    document.getElementById('current-week-range').textContent = `${days[0].label} - ${days[6].label}, ${state.currentWeek.getFullYear()}`;
+}
+
+// ---- Calendar rendering: uses only manually added slots and slots loaded from backend ----
+function renderCalendar(){
+    const grid = document.getElementById('calendar-grid');
+    grid.innerHTML = '';
+    const days = getWeekDays(state.currentWeek);
+
+    days.forEach(d=>{
+        const col = document.createElement('div');
+        col.className = 'day-col border rounded p-2 min-h-[200px]';
+        const header = document.createElement('div');
+        header.className = 'font-medium mb-2';
+        header.textContent = d.label;
+        col.appendChild(header);
+
+        // collect slots for this day
+        const slots = Object.values(state.selectedSlots).filter(s=>s.date===d.date).sort((a,b)=>a.start.localeCompare(b.start));
+
+        if(slots.length===0){
+            const empty = document.createElement('div');
+            empty.className = 'text-sm text-slate-400';
+            empty.textContent = 'No slots';
+            col.appendChild(empty);
+        } else {
+            slots.forEach(slot=>{
+                const card = document.createElement('div');
+                card.className = 'slot-card p-2 border rounded mb-2 flex justify-between items-center bg-white';
+                card.dataset.key = `${slot.date}|${slot.start}`;
+                card.innerHTML = `
+                    <div>
+                        <div class="text-sm font-medium">${formatDisplay(slot.start)} - ${formatDisplay(slot.end)}</div>
+                        <div class="text-xs text-slate-500">${slot.note||''}</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button class="remove-slot px-2 py-1 border rounded text-sm">Remove</button>
+                    </div>
+                `;
+                card.querySelector('.remove-slot').addEventListener('click', ()=>{ delete state.selectedSlots[`${slot.date}|${slot.start}`]; renderCalendar(); updateSummary(); });
+                col.appendChild(card);
+            });
+        }
+
+        grid.appendChild(col);
+    });
+}
+
+// ---- Add manual slot ----
+function onAddManualSlot(){
+    const start = document.getElementById('manual-start').value;
+    const end = document.getElementById('manual-end').value;
+    const day = document.getElementById('manual-day').value;
+
+    if(!start || !end){ showNotification('Please choose both start and end time','error'); return; }
+    if(start>=end){ showNotification('End time must be after start time','error'); return; }
+
+    const key = `${day}|${start}`;
+
+    // prevent overlap with existing slot that has same start
+    if(state.selectedSlots[key]){ showNotification('A slot with this start time already exists for that day','error'); return; }
+
+    // optional: prevent overlapping slots — simple check
+    const overlaps = Object.values(state.selectedSlots).some(s=>s.date===day && !(end<=s.start || start>=s.end));
+    if(overlaps){ showNotification('Slot overlaps an existing slot for that day','error'); return; }
+
+    state.selectedSlots[key] = {date: day, start: start, end: end};
+    document.getElementById('manual-start').value = '';
+    document.getElementById('manual-end').value = '';
+    renderCalendar(); updateSummary();
+    showNotification('Slot added','success');
+}
+
+// ---- Select all today (creates hourly slots across day using sessionDuration) ----
+function onSelectAllToday(){
+    const today = formatDateIso(new Date());
+    // create hourly segments between 09:00 and 18:00 by default or use sessionDuration
+    const startHour = 9; const endHour = 18;
+    for(let h=startHour; h<endHour; h++){
+        const s = `${String(h).padStart(2,'0')}:00`;
+        const e = `${String(h+1).padStart(2,'0')}:00`;
+        const key = `${today}|${s}`;
+        // don't overwrite booked ones
+        if(!state.selectedSlots[key]){
+            state.selectedSlots[key] = {date: today, start: s, end: e};
+        }
+    }
+    renderCalendar(); updateSummary();
+    showNotification('All slots for today selected','success');
+}
+
+function onClearAllToday(){
+    const today = formatDateIso(new Date());
+    Object.keys(state.selectedSlots).forEach(k=>{ if(k.startsWith(`${today}|`)) delete state.selectedSlots[k]; });
+    renderCalendar(); updateSummary();
+    showNotification('All slots for today cleared','success');
+}
+
+function onCopyToWeek(){
+    const today = formatDateIso(new Date());
+    const days = getWeekDays(state.currentWeek).map(d=>d.date);
+    const template = Object.values(state.selectedSlots).filter(s=>s.date===today);
+    if(template.length===0){ showNotification('No slots for today to copy','error'); return; }
+
+    days.forEach(day=>{
+        if(day===today) return;
+        // remove existing for that day
+        Object.keys(state.selectedSlots).forEach(k=>{ if(k.startsWith(`${day}|`)) delete state.selectedSlots[k]; });
+        template.forEach(slot=>{
+            const key = `${day}|${slot.start}`;
+            state.selectedSlots[key] = {date: day, start: slot.start, end: slot.end};
+        });
+    });
+    renderCalendar(); updateSummary();
+    showNotification("Today's slots copied to week", 'success');
+}
+
+// ---- Fetch availability from backend for current week ----
+function fetchAvailabilityForWeek(){
+    const days = getWeekDays(state.currentWeek);
+    const start = days[0].date; const end = days[6].date;
+    fetch(`${manageAvailabilityConfig.fetchUrl}?start=${start}&end=${end}`)
+        .then(r=>r.json())
+        .then(data=>{
+            if(!data.success){ showNotification(data.error||'Unable to load availability','error'); return; }
+            // hydrate UI config
+            state.sessionDuration = data.session_duration || state.sessionDuration;
+            state.breakDuration = data.break_duration || state.breakDuration;
+            state.profileVisible = data.profile_visible;
+            document.getElementById('profile-visibility').checked = state.profileVisible;
+            // reset slots & load
+            state.selectedSlots = {};
+            (data.slots||[]).forEach(slot=>{
+                const key = `${slot.date}|${slot.start_time}`;
+                state.selectedSlots[key] = {date: slot.date, start: slot.start_time, end: slot.end_time};
+            });
+            renderCalendar(); updateSummary();
+        }).catch(()=>{ showNotification('Unable to load availability.','error'); });
+}
+
+// ---- Save slots to backend ----
+function onSaveSlots(){
+    const days = getWeekDays(state.currentWeek);
+    const payload = {
+        session_duration: state.sessionDuration,
+        break_duration: state.breakDuration,
+        profile_visible: state.profileVisible,
+        range_start: days[0].date,
+        range_end: days[6].date,
+        slots: Object.values(state.selectedSlots).map(s=>({date:s.date, start_time:s.start, end_time:s.end}))
+    };
+
+    const btn = document.getElementById('save-slots');
+    const orig = btn.innerHTML;
+    btn.innerHTML = 'Saving...'; btn.disabled = true;
+
+    fetch(manageAvailabilityConfig.saveUrl, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json', 'X-CSRFToken': csrfToken},
+        body: JSON.stringify(payload)
+    }).then(r=>r.json())
+      .then(data=>{
+          if(!data.success){ showNotification(data.error||'Unable to save','error'); return; }
+          document.getElementById('success-modal').classList.remove('hidden');
+          // reload backend slots
+          state.selectedSlots = {};
+          (data.slots||[]).forEach(slot=>{ const key = `${slot.date}|${slot.start_time}`; state.selectedSlots[key] = {date:slot.date,start:slot.start_time,end:slot.end_time}; });
+          renderCalendar(); updateSummary();
+      }).catch(()=>{ showNotification('Failed to save','error'); })
+      .finally(()=>{ btn.innerHTML = orig; btn.disabled = false; });
+}
+
+// ---- Summary ----
+function updateSummary(){
+    const slots = Object.values(state.selectedSlots);
+    const totalSessions = slots.length;
+    const totalMinutes = slots.reduce((acc,s)=>{
+        const [sh,sm]=s.start.split(':').map(Number); const [eh,em]=s.end.split(':').map(Number);
+        const mins = (eh*60+em)-(sh*60+sm);
+        return acc + Math.max(0,mins);
+    },0);
+    const totalHours = totalMinutes/60;
+    const avg = totalSessions/7;
+
+    const week = getWeekDays(state.currentWeek);
+    let busiest='-'; let max=0; const counts={};
+    week.forEach(w=>{ const c = slots.filter(s=>s.date===w.date).length; counts[w.date]=c; if(c>max){ max=c; busiest = w.label.split(',')[0]; } });
+
+    document.getElementById('total-hours').textContent = totalHours.toFixed(1);
+    document.getElementById('total-sessions').textContent = totalSessions;
+    document.getElementById('average-daily').textContent = avg.toFixed(1);
+    document.getElementById('busiest-day').textContent = busiest;
+
+    const dist = document.getElementById('day-distribution-grid'); dist.innerHTML = '';
+    week.forEach(w=>{ const el = document.createElement('div'); el.className='p-2 border rounded text-center text-sm'; el.innerHTML = `<div>${w.label.split(',')[0]}</div><div class="text-xl font-semibold">${counts[w.date]||0}</div>`; dist.appendChild(el); });
+}
+
+// ---- Notifications ----
+function showNotification(msg,type='info'){
+    const n = document.createElement('div'); n.className = `fixed top-4 right-4 px-4 py-2 rounded shadow-lg z-50 ${type==='success'?'bg-emerald-600 text-white':(type==='error'?'bg-rose-600 text-white':'bg-indigo-600 text-white')}`; n.textContent = msg; document.body.appendChild(n); setTimeout(()=>n.remove(),3000);
+}
+
+</script>
+
+{% endblock %}

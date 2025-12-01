@@ -1,0 +1,534 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Find Therapists - MindEase{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Additional styles specific to therapists page */
+    .filter-transition {
+        transition: all 0.3s ease;
+    }
+    
+    .search-focus:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+    
+    .checkbox-custom:checked {
+        background-color: var(--primary);
+        border-color: var(--primary);
+    }
+    
+    .specialty-tag {
+        display: inline-block;
+        background-color: #e0e7ff;
+        color: var(--primary);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        margin-right: 6px;
+        margin-bottom: 6px;
+    }
+    
+    .rating-stars {
+        color: #fbbf24;
+    }
+    
+    .active-filter-tag {
+        display: inline-flex;
+        align-items: center;
+        background-color: #e0e7ff;
+        color: var(--primary);
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+    
+    .pagination-active {
+        background-color: var(--primary);
+        color: white;
+    }
+    
+    /* Smooth hover transitions */
+    #user-menu a {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Icon container hover effects */
+    #user-menu a div {
+        transition: all 0.3s ease;
+    }
+
+    /* Smooth opacity transitions */
+    nav, main, footer {
+        transition: opacity 0.3s ease-in-out;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-gradient text-white pt-24 pb-20 md:pt-32 md:pb-24 overflow-hidden relative">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.1\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="flex flex-col lg:flex-row items-center justify-between">
+            <!-- Left Content -->
+            <div class="lg:w-1/2 mb-12 lg:mb-0 animate-slide-up">
+                <!-- Trust Badge -->
+                <div class="inline-flex items-center px-4 py-2 rounded-full bg-white bg-opacity-20 text-sm font-medium mb-6 backdrop-blur-sm border border-white border-opacity-30">
+                    <i class="fas fa-shield-alt mr-2 text-cyan-300"></i> Trusted by 10,000+ individuals
+                </div>
+                
+                <!-- Main Heading -->
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+                    Find Your Perfect 
+                    <span class="text-cyan-300 block">Therapist Match</span>
+                </h1>
+                
+                <!-- Subheading -->
+                <p class="text-xl text-indigo-100 mb-8 max-w-2xl leading-relaxed">
+                    Connect with licensed mental health professionals who specialize in your specific needs. 
+                    Personalized matching for your wellness journey with 97% success rate.
+                </p>
+                
+                <!-- CTA Buttons -->
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="#search-section" class="bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold text-center hover:bg-indigo-50 transition-all shadow-lg hover:shadow-xl animate-scale flex items-center justify-center">
+                        <i class="fas fa-search mr-3"></i>
+                        Find Therapists Now
+                    </a>
+                    {% if not user.is_authenticated %}
+                    <a href="{% url 'register' %}" class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-center hover:bg-white hover:bg-opacity-10 transition-all flex items-center justify-center">
+                        <i class="fas fa-user-plus mr-3"></i>
+                        Sign Up Free
+                    </a>
+                    {% endif %}
+                </div>
+                
+                <!-- Quick Stats -->
+                <div class="flex flex-wrap gap-6 mt-8 pt-6 border-t border-white border-opacity-20">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-green-400 rounded-full mr-3"></div>
+                        <span class="text-indigo-200">150+ Verified Therapists</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-amber-400 rounded-full mr-3"></div>
+                        <span class="text-indigo-200">97% Match Success</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Visual Content -->
+            <div class="lg:w-1/2 flex justify-center relative">
+                <div class="relative w-full max-w-lg">
+                    <!-- Main Floating Graphic -->
+                    <div class="w-72 h-72 md:w-96 md:h-96 rounded-full bg-white bg-opacity-10 flex items-center justify-center mx-auto animate-float">
+                        <div class="w-56 h-56 md:w-72 md:h-72 rounded-full bg-white bg-opacity-15 flex items-center justify-center pulse-slow">
+                            <div class="w-40 h-40 md:w-52 md:h-52 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
+                                <i class="fas fa-heart text-white text-5xl md:text-6xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Floating Badge 1 -->
+                    <div class="absolute -top-2 -right-4 bg-amber-500 text-white px-5 py-3 rounded-full text-sm font-semibold shadow-xl animate-float" style="animation-delay: 1s;">
+                        <div class="flex items-center">
+                            <i class="fas fa-bolt mr-2"></i>
+                            <span>97% Match Rate</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Floating Badge 2 -->
+                    <div class="absolute -bottom-8 -left-6 bg-white text-slate-800 px-5 py-4 rounded-2xl shadow-xl animate-float" style="animation-delay: 2s;">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mr-3">
+                                <i class="fas fa-user-md text-lg"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-lg">150+</div>
+                                <div class="text-xs text-slate-500">Expert Therapists</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Floating Badge 3 -->
+                    <div class="absolute top-1/2 -right-10 bg-cyan-500 text-white px-5 py-3 rounded-full text-sm font-semibold shadow-xl animate-float" style="animation-delay: 3s;">
+                        <div class="flex items-center">
+                            <i class="fas fa-clock mr-2"></i>
+                            <span>24/7 Available</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Search & Filters Section -->
+<section id="search-section" class="py-8 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <form id="filter-form" method="get" class="flex flex-col lg:flex-row gap-6">
+            <!-- Search Bar -->
+            <div class="flex-1">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-slate-400"></i>
+                    </div>
+                    <input type="text" name="search" id="search-input" value="{{ request.GET.search|default:'' }}" class="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 search-focus transition-all" placeholder="Search by name, specialty, or keyword...">
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <button id="filters-toggle" type="button" class="bg-white border border-slate-300 text-slate-700 px-3 py-2 rounded-lg font-medium hover:bg-slate-50 transition-colors">
+                        <i class="fas fa-filter mr-2"></i> Filters
+                    </button>
+                    <!-- Expanded Filters Panel positioned as a dropdown so it doesn't take full width -->
+                    <div id="filters-panel" class="absolute right-0 top-full mt-2 bg-slate-50 rounded-xl p-4 shadow-lg hidden z-50 w-full sm:w-[520px] max-w-[calc(100vw-2rem)]">
+                    <div class="mb-4 grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                        <div class="md:col-span-1">
+                            <label class="text-sm font-semibold text-slate-700 mb-2 block">Specialization</label>
+                            <select name="specialization" class="w-full border border-slate-300 rounded-lg px-3 py-2 bg-white">
+                                <option  value="">All Specializations</option>
+                                {% for spec in specializations_list %}
+                                    <option value="{{ spec.id }}" {% if request.GET.specialization == spec.id|stringformat:"s" %}selected{% endif %}>{{ spec.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="text-sm font-semibold text-slate-700 mb-2 block">Sort By</label>
+                            <select name="sort" class="w-full border border-slate-300 rounded-lg px-3 py-2 bg-white">
+                                <option value="">Recommended</option>
+                                <option value="highest_rated" {% if request.GET.sort == 'highest_rated' or request.GET.sort == 'rating' %}selected{% endif %}>Highest Rated</option>
+                                <option value="lowest_fee" {% if request.GET.sort == 'lowest_fee' or request.GET.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                                <option value="price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                                <option value="experience" {% if request.GET.sort == 'experience' %}selected{% endif %}>Most Experienced</option>
+                                <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>Newest</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-1 text-right">
+                            <a href="{{ request.path }}" id="clear-filters-top" class="text-slate-600 hover:text-slate-800 font-medium transition-colors">Clear</a>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Experience Filter -->
+                        <div>
+                            <h3 class="text-sm font-semibold text-slate-800 mb-3">Experience (years)</h3>
+                            <div class="space-y-2">
+                                <input type="number" name="min_experience" placeholder="Min" value="{{ request.GET.min_experience|default:'' }}" class="w-full px-3 py-2 border rounded-lg" />
+                                <input type="number" name="max_experience" placeholder="Max" value="{{ request.GET.max_experience|default:'' }}" class="w-full px-3 py-2 border rounded-lg" />
+                            </div>
+                        </div>
+
+                        <!-- Price Range Filter -->
+                        <div>
+                            <h3 class="text-sm font-semibold text-slate-800 mb-3">Price Range (per session)</h3>
+                            <div class="space-y-2">
+                                <input type="text" name="min_price" placeholder="Min (e.g. 500.00)" value="{{ request.GET.min_price|default:'' }}" class="w-full px-3 py-2 border rounded-lg" />
+                                <input type="text" name="max_price" placeholder="Max (e.g. 2000.00)" value="{{ request.GET.max_price|default:'' }}" class="w-full px-3 py-2 border rounded-lg" />
+                            </div>
+                        </div>
+
+                        <!-- Rating Filter -->
+                        <div>
+                            <h3 class="text-sm font-semibold text-slate-800 mb-3">Minimum Rating</h3>
+                            <div class="space-y-2">
+                                <select name="min_rating" class="w-full px-3 py-2 border rounded-lg">
+                                    <option value="">Any</option>
+                                    <option value="1" {% if request.GET.min_rating == '1' %}selected{% endif %}>1+</option>
+                                    <option value="2" {% if request.GET.min_rating == '2' %}selected{% endif %}>2+</option>
+                                    <option value="3" {% if request.GET.min_rating == '3' %}selected{% endif %}>3+</option>
+                                    <option value="4" {% if request.GET.min_rating == '4' %}selected{% endif %}>4+</option>
+                                    <option value="4.5" {% if request.GET.min_rating == '4.5' %}selected{% endif %}>4.5+</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between mt-6 pt-6 border-t border-slate-200">
+                        <a href="{{ request.path }}" id="clear-filters" class="text-slate-600 hover:text-slate-800 font-medium transition-colors">Clear All Filters</a>
+                        <button type="submit" id="apply-filters-panel" class="bg-indigo-600 text-white px-4 py-2 rounded-md font-medium hover:bg-indigo-700 transition-colors">Apply Filters</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Active Filters Display -->
+        <div id="active-filters-container" class="mt-4 hidden">
+            <div class="flex flex-wrap items-center">
+                <span class="text-sm text-slate-600 mr-3">Active filters:</span>
+                <!-- Active filters will be inserted here by JavaScript -->
+            </div>
+        </div>
+        
+        
+        
+        <!-- Property Options Panel -->
+        <div id="property-panel" class="mt-4 bg-white rounded-xl p-4 shadow-sm hidden animate-slide-up">
+            <div class="flex flex-wrap gap-3">
+                <button class="property-option bg-indigo-100 text-indigo-800 px-4 py-2 rounded-lg font-medium transition-colors" data-sort="recommended">
+                    Recommended
+                </button>
+                <button class="property-option bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg font-medium hover:bg-slate-50 transition-colors" data-sort="rating">
+                    Highest Rated
+                </button>
+                <button class="property-option bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg font-medium hover:bg-slate-50 transition-colors" data-sort="experience">
+                    Most Experienced
+                </button>
+                <button class="property-option bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg font-medium hover:bg-slate-50 transition-colors" data-sort="price-low">
+                    Price: Low to High
+                </button>
+                <button class="property-option bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg font-medium hover:bg-slate-50 transition-colors" data-sort="price-high">
+                    Price: High to Low
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Therapists Listing Section -->
+<section class="py-12 bg-slate-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Results Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+            <div>
+                <h2 class="text-xl font-bold text-slate-900">Available Therapists</h2>
+                <p id="results-count" class="text-slate-600 mt-1">Showing <span id="showing-count">{{ page_obj.start_index }} - {{ page_obj.end_index }}</span> of <span id="total-count">{{ page_obj.paginator.count }}</span> therapists</p>
+            </div>
+            <div class="mt-4 md:mt-0">
+                <div class="flex items-center text-slate-600">
+                    <span class="text-sm mr-3">View:</span>
+                    <button id="view-grid" class="p-2 rounded-lg bg-indigo-100 text-indigo-700 mr-2">
+                        <i class="fas fa-th"></i>
+                    </button>
+                    <button id="view-list" class="p-2 rounded-lg bg-white text-slate-500 border border-slate-300">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+      <!-- Therapists Grid -->
+    <div id="therapists-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for c in therapists %}
+
+        <!-- Therapist Card -->
+        <div class="bg-white rounded-2xl overflow-hidden shadow-sm card-hover animate-slide-up">
+
+            <div class="p-6">
+                <!-- Header Section -->
+                <div class="flex items-start justify-between mb-4">
+
+                    <!-- Profile -->
+                    <div class="flex items-center">
+
+                        {% if c.user.profile_picture %}
+                            <img src="{{ c.user.profile_picture.url }}" 
+                                class="w-16 h-16 rounded-full object-cover mr-4">
+                        {% else %}
+                            {% comment %} Initials + Random Color {% endcomment %}
+                            <div class="w-16 h-16 rounded-full bg-indigo-100 text-indigo-600 
+                                        flex items-center justify-center font-bold text-xl mr-4">
+                                {{ c.user.first_name|first|upper }}{{ c.user.last_name|first|upper }}
+                            </div>
+                        {% endif %}
+
+                        <div>
+                            <h3 class="font-semibold text-slate-900">
+                                {{ c.user.first_name }} {{ c.user.last_name }}
+                            </h3>
+                            <div class="text-sm text-slate-600 mt-1">
+                                {{ c.years_experience }} years experience
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rating -->
+                    <div class="flex items-center">
+                        <div class="text-amber-400 mr-1">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <span class="text-slate-700 font-medium">{{ c.rating }}</span>
+                    </div>
+                </div>
+
+                <!-- Specialization -->
+                <div class="mb-4">
+                    {% for spec in c.specializations.all %}
+                        <span class="specialty-tag">{{ spec.name }}</span>
+                    {% empty %}
+                        <span class="text-sm text-slate-500">General Therapy</span>
+                    {% endfor %}
+                </div>
+                <!-- Description -->
+                <p class="text-slate-600 text-sm mb-4">
+                    {{ c.short_bio|default:"Experienced therapist providing quality mental health support." }}
+                </p>
+
+                <!-- Available -->
+                <div class="flex items-center text-sm text-slate-500 mb-4">
+                    <i class="fas fa-calendar-alt mr-2"></i>
+                    <span>Available for Online Sessions</span>
+                </div>
+
+                <!-- Footer -->
+                <div class="flex justify-between items-center">
+                    <div class="text-slate-900 font-semibold">₹{{ c.session_fee }}/session</div>
+
+                    <a href="{% url 'counsellor_detail' c.user.id %}"
+                    class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors animate-scale">
+                        View Profile
+                    </a>
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+        <!-- Pagination -->
+        <div class="mt-12 flex flex-col sm:flex-row items-center justify-between">
+            <div class="text-sm text-slate-600 mb-4 sm:mb-0">
+                Showing page <span id="current-page">{{ page_obj.number }}</span> of <span id="total-pages">{{ page_obj.paginator.num_pages }}</span>
+            </div>
+            <div class="flex space-x-2 items-center">
+                <a id="prev-link" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" aria-disabled="true">
+                    <i class="fas fa-chevron-left mr-2"></i> Previous
+                </a>
+                <div id="page-numbers" class="flex space-x-1">
+                    <!-- Page numbers will be inserted here by JavaScript -->
+                </div>
+                <a id="next-link" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors">
+                    Next <i class="fas fa-chevron-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Build a query string preserving all existing params except `page`.
+function buildBaseQuery() {
+    const params = new URLSearchParams(window.location.search);
+    params.delete('page');
+    const s = params.toString();
+    return s ? '?' + s + '&' : '?';
+}
+
+function renderPagination() {
+    const base = buildBaseQuery();
+    const current = Number({{ page_obj.number }});
+    const total = Number({{ page_obj.paginator.num_pages }});
+
+    const prevLink = document.getElementById('prev-link');
+    const nextLink = document.getElementById('next-link');
+    const numbers = document.getElementById('page-numbers');
+    numbers.innerHTML = '';
+
+    if (current > 1) {
+        prevLink.href = base + 'page=' + (current - 1);
+        prevLink.removeAttribute('aria-disabled');
+    } else {
+        prevLink.removeAttribute('href');
+        prevLink.setAttribute('aria-disabled', 'true');
+    }
+
+    if (current < total) {
+        nextLink.href = base + 'page=' + (current + 1);
+        nextLink.removeAttribute('aria-disabled');
+    } else {
+        nextLink.removeAttribute('href');
+        nextLink.setAttribute('aria-disabled', 'true');
+    }
+
+    // Render a small window of page numbers
+    const start = Math.max(1, current - 2);
+    const end = Math.min(total, current + 2);
+    for (let i = start; i <= end; i++) {
+        const a = document.createElement('a');
+        a.className = 'px-3 py-1 rounded-lg border border-slate-200 text-sm';
+        if (i === current) {
+            a.className += ' bg-indigo-600 text-white';
+        } else {
+            a.className += ' bg-white text-slate-700 hover:bg-slate-50';
+            a.href = base + 'page=' + i;
+        }
+        a.textContent = i;
+        numbers.appendChild(a);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    renderPagination();
+
+    // Make sort/property buttons set the sort value and submit the form
+    document.querySelectorAll('.property-option').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            const sort = btn.getAttribute('data-sort');
+            const form = document.getElementById('filter-form');
+            let input = form.querySelector('[name="sort"]');
+            if (!input) {
+                input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'sort';
+                form.appendChild(input);
+            }
+            input.value = sort;
+            form.submit();
+        });
+    });
+
+    // Filters panel toggle
+    const filtersToggle = document.getElementById('filters-toggle');
+    const filtersPanel = document.getElementById('filters-panel');
+    if (filtersToggle && filtersPanel) {
+        filtersToggle.addEventListener('click', function() {
+            filtersPanel.classList.toggle('hidden');
+            // focus first input when opening
+            if (!filtersPanel.classList.contains('hidden')) {
+                const first = filtersPanel.querySelector('input, select, textarea');
+                if (first) first.focus();
+            }
+        });
+    }
+
+    // After applying filters via panel, submit the main filter form and hide the panel
+    const applyPanelBtn = document.getElementById('apply-filters-panel');
+    if (applyPanelBtn) {
+        applyPanelBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = document.getElementById('filter-form');
+            if (form) {
+                // Submit the existing GET form so all inputs are sent together
+                form.submit();
+            } else {
+                // Fallback: reload page without params
+                window.location.href = window.location.pathname;
+            }
+            if (filtersPanel) filtersPanel.classList.add('hidden');
+        });
+    }
+
+    // Clear filters links should remove GET params and reload
+    document.querySelectorAll('#clear-filters, #clear-filters-top').forEach(function(link) {
+        if (link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = window.location.pathname;
+            });
+        }
+    });
+});
+</script>
+
+{% endblock %}

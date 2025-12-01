@@ -1,0 +1,838 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - MindEase Counsellor{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Dashboard Container */
+    .dashboard-container {
+        min-height: calc(100vh - 80px);
+        background: #f8fafc;
+        padding: 1.5rem 0;
+    }
+
+
+    /* Welcome Section */
+    .welcome-section {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        color: white;
+        position: relative;
+        margin-top: 4rem;
+        overflow: hidden;
+    }
+
+    .welcome-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" opacity="0.1"><path d="M0,400 Q300,200 600,400 T1200,200 L1200,600 L0,600 Z" fill="white"/></svg>');
+        background-size: cover;
+    }
+
+    .welcome-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .welcome-content h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: white;
+    }
+
+    .welcome-content p {
+        font-size: 1rem;
+        opacity: 0.9;
+        margin-bottom: 1.5rem;
+    }
+
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        border-left: 4px solid var(--primary);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: white;
+        margin-right: 1rem;
+    }
+
+    .stat-info {
+        flex: 1;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1e293b;
+        line-height: 1;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .stat-change {
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.5rem 0.75rem;
+        background: #f1f5f9;
+        border-radius: 8px;
+        width: fit-content;
+        margin-top: auto;
+    }
+
+    .stat-change.positive {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .stat-change.negative {
+        background: #fef2f2;
+        color: #991b1b;
+    }
+
+    /* Main Dashboard Layout */
+    .dashboard-main {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    /* Section Styling */
+    .dashboard-section {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+        width: 100%;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .section-title i {
+        color: var(--primary);
+        font-size: 1.25rem;
+    }
+
+    .section-count {
+        background: var(--primary);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 12px;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    /* Earnings Section - Horizontal Cards */
+    .earnings-content {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+    }
+
+    .earnings-chart {
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        border-radius: 12px;
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        grid-column: 1 / -1;
+        margin-bottom: 1.5rem;
+    }
+
+    .earnings-chart::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" preserveAspectRatio="none"><path d="M0,200 Q150,50 300,150 T600,100 L600,200 Z" fill="%234f46e5" opacity="0.08"/><path d="M0,200 Q150,80 300,170 T600,120 L600,200 Z" fill="%238b5cf6" opacity="0.05"/></svg>');
+        background-size: cover;
+    }
+
+    .chart-content {
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        padding: 1.5rem;
+    }
+
+    .chart-content i {
+        font-size: 2.5rem;
+        color: var(--primary);
+        margin-bottom: 1rem;
+    }
+
+    .chart-content h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .chart-content p {
+        color: #64748b;
+        font-size: 0.875rem;
+        line-height: 1.4;
+    }
+
+    .earning-stat {
+        text-align: center;
+        padding: 1.5rem 1rem;
+        background: #f8fafc;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .earning-stat:hover {
+        transform: translateY(-3px);
+        background: white;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .earning-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .earning-label {
+        font-size: 0.875rem;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    /* Appointments Section - 2 per row */
+    .appointments-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    .appointment-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid #f1f5f9;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .appointment-card::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: var(--primary);
+        border-radius: 4px 0 0 4px;
+    }
+
+    .appointment-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .appointment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        gap: 1rem;
+    }
+
+    .appointment-client {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex: 1;
+    }
+
+    .client-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .client-info h4 {
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
+        font-size: 1rem;
+    }
+
+    .client-info p {
+        color: #64748b;
+        font-size: 0.875rem;
+        line-height: 1.4;
+    }
+
+    .appointment-time {
+        text-align: right;
+        flex-shrink: 0;
+    }
+
+    .time-badge {
+        background: var(--primary);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .time-badge.soon {
+        background: #f59e0b;
+    }
+
+    .appointment-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: auto;
+    }
+
+    .btn {
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+        background: white;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+    }
+
+    .btn-secondary:hover {
+        background: #f8fafc;
+        border-color: var(--primary);
+    }
+
+    /* CTA Button */
+    .cta-button {
+        background: white;
+        color: var(--primary);
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .cta-button:hover {
+        background: #f8fafc;
+        transform: translateY(-2px);
+    }
+
+    /* Animations */
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-card {
+        animation: slideInUp 0.5s ease forwards;
+        opacity: 0;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .earnings-content {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .welcome-section {
+            position: relative;
+            top: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .earnings-content {
+            grid-template-columns: 1fr;
+        }
+
+        .appointments-container {
+            grid-template-columns: 1fr;
+        }
+
+        .appointment-header {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .appointment-time {
+            text-align: left;
+            width: 100%;
+        }
+
+        .time-badge {
+            width: 100%;
+            text-align: center;
+        }
+
+        .appointment-actions {
+            flex-direction: column;
+        }
+
+        .section-header {
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+
+        .section-count {
+            align-self: flex-start;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Updated Dashboard -->
+<div class="dashboard-container">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Welcome Hero Section -->
+        <div class="welcome-section animate-card">
+            <div class="welcome-content">
+                <h1>Welcome back, {{ counsellor.user.get_full_name }}! 👋</h1>
+                <p>Here's your practice overview for <span id="current-date" class="font-semibold">today</span></p>
+                <a href="{% url 'counsellor_manage_slots' %}" class="cta-button">
+                    <i class="fas fa-plus"></i>
+                    Manage Availability
+                </a>
+            </div>
+        </div>
+
+
+        <!-- Key Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card animate-card" style="animation-delay: 0.1s">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-indian-rupee-sign"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">₹{{ total_earnings|default:'0.00' }}</div>
+                        <div class="stat-label">Total Earnings</div>
+                    </div>
+                </div>
+                <div class="stat-change positive">
+                    <i class="fas fa-wallet"></i>
+                    ₹{{ earnings_summary.monthly|default:'0.00' }} this month
+                </div>
+            </div>
+
+            <div class="stat-card animate-card" style="animation-delay: 0.2s">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">{{ todays_sessions_count }}</div>
+                        <div class="stat-label">Today's Sessions</div>
+                    </div>
+                </div>
+                <div class="stat-change positive">
+                    <i class="fas fa-clock"></i>
+                    {{ pending_sessions_count }} pending confirmations
+                </div>
+            </div>
+
+            <div class="stat-card animate-card" style="animation-delay: 0.3s">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-smile"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">{{ satisfaction_percent }}%</div>
+                        <div class="stat-label">Client Satisfaction</div>
+                    </div>
+                </div>
+                <div class="stat-change positive">
+                    <i class="fas fa-thumbs-up"></i>
+                    2% improvement
+                </div>
+            </div>
+
+            <div class="stat-card animate-card" style="animation-delay: 0.4s">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">{{ total_clients }}</div>
+                        <div class="stat-label">Active Clients</div>
+                    </div>
+                </div>
+                <div class="stat-change positive">
+                    <i class="fas fa-user-plus"></i>
+                    {{ earnings_summary.monthly_sessions }} sessions this month
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard Content -->
+        <div class="dashboard-main">
+            <!-- Earnings Analytics Section - Full Width -->
+            <div class="dashboard-section animate-card" style="animation-delay: 0.5s">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-chart-line"></i>
+                        Earnings Analytics
+                    </h2>
+                </div>
+
+                <div class="earnings-content">
+                    <div class="earnings-chart">
+                        <div class="chart-content">
+                            <i class="fas fa-chart-bar"></i>
+                            <h3>Revenue Overview</h3>
+                            <p>Track your earnings and session performance</p>
+                        </div>
+                    </div>
+
+                    <!-- Earnings Cards in Horizontal Row -->
+                    <div class="earning-stat">
+                        <div class="earning-value">₹{{ earnings_summary.monthly|default:'0.00' }}</div>
+                        <div class="earning-label">Earnings This Month</div>
+                    </div>
+                    <div class="earning-stat">
+                        <div class="earning-value">₹{{ earnings_summary.average|default:'0.00' }}</div>
+                        <div class="earning-label">Avg Session Value</div>
+                    </div>
+                    <div class="earning-stat">
+                        <div class="earning-value">{{ earnings_summary.monthly_sessions|default:0 }}</div>
+                        <div class="earning-label">Sessions This Month</div>
+                    </div>
+                    <div class="earning-stat">
+                        <div class="earning-value">{{ total_sessions }}</div>
+                        <div class="earning-label">Lifetime Sessions</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Appointments Section - Full Width -->
+            <div class="dashboard-section animate-card" style="animation-delay: 0.6s">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-calendar-day"></i>
+                        Today's Appointments
+                    </h2>
+                    <span class="section-count">{{ todays_sessions_count }} Sessions</span>
+                </div>
+
+                <!-- Appointments - 2 per row, no priority appointments -->
+                <div class="appointments-container">
+                    {% if todays_sessions %}
+                    {% for appointment in todays_sessions %}
+                    <div class="appointment-card">
+                        <div class="appointment-header">
+                            <div class="appointment-client">
+                                <div class="client-avatar">
+                                    {{ appointment.client.user.first_name|first }}{{
+                                    appointment.client.user.last_name|first }}
+                                </div>
+                                <div class="client-info">
+                                    <h4>{{ appointment.client.user.get_full_name }}</h4>
+                                    <p>{{ appointment.client.primary_concern|default:'Therapy Session' }} • Google Meet
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="appointment-time">
+                                <div class="time-badge">
+                                    {{ appointment.session_time|time:"g:i A" }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="appointment-actions">
+                            {% if appointment.google_meet_link %}
+                            <a href="{{ appointment.google_meet_link }}" target="_blank" rel="noopener"
+                                class="btn btn-primary">
+                                <i class="fas fa-video"></i>
+                                Start Session
+                            </a>
+                            {% endif %}
+                            <button class="btn btn-secondary" disabled>
+                                <i class="fas fa-notes-medical"></i>
+                                Notes (soon)
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="p-6 text-center text-slate-500 col-span-2">
+                        No sessions scheduled today. Keep your calendar fresh by approving new bookings.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Upcoming Appointments Section - Full Width -->
+            <div class="dashboard-section animate-card" style="animation-delay: 0.7s">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        Upcoming Appointments
+                    </h2>
+                    <span class="section-count">{{ upcoming_sessions|length }} Sessions</span>
+                </div>
+
+                <div class="appointments-container">
+                    {% if upcoming_sessions %}
+                    {% for appointment in upcoming_sessions %}
+                    <div class="appointment-card">
+                        <div class="appointment-header">
+                            <div class="appointment-client">
+                                <div class="client-avatar">
+                                    {{ appointment.client.user.first_name|first }}{{
+                                    appointment.client.user.last_name|first }}
+                                </div>
+                                <div class="client-info">
+                                    <h4>{{ appointment.client.user.get_full_name }}</h4>
+                                    <p>{{ appointment.client.primary_concern|default:'Therapy Session' }}</p>
+                                    <p class="text-sm text-slate-500">
+                                        <i class="far fa-calendar mr-1"></i> {{ appointment.session_date}}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="appointment-time">
+                                <div class="time-badge">
+                                    {{ appointment.session_time|time:"g:i A" }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="appointment-actions">
+                            {% if appointment.google_meet_link %}
+                            <a href="{{ appointment.google_meet_link }}" target="_blank" rel="noopener"
+                                class="btn btn-primary">
+                                <i class="fas fa-video"></i>
+                                Join Meeting
+                            </a>
+                            {% endif %}
+                            <button class="btn btn-secondary" disabled>
+                                <i class="fas fa-info-circle"></i>
+                                Details
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="p-6 text-center text-slate-500 col-span-2">
+                        No upcoming sessions scheduled.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Set current date with beautiful formatting
+        const now = new Date();
+        const options = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        };
+        const formattedDate = now.toLocaleDateString('en-US', options);
+        document.getElementById('current-date').textContent = formattedDate;
+
+        // Animate cards with beautiful staggered delays
+        const cards = document.querySelectorAll('.animate-card');
+        cards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+        });
+
+        // Add beautiful hover effects and interactions
+        document.querySelectorAll('.btn-primary').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const card = this.closest('.appointment-card');
+                const clientName = card.querySelector('h4').textContent;
+                showNotification(`Starting session with ${clientName}...`, 'success');
+            });
+        });
+
+        document.querySelectorAll('.btn-secondary').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const action = this.querySelector('i').className.includes('clock') ? 'Reschedule' :
+                    this.querySelector('i').className.includes('file-alt') ? 'Details' : 'Notes';
+                showNotification(`Opening ${action} panel...`, 'info');
+            });
+        });
+
+        // Enhanced appointment card click
+        document.querySelectorAll('.appointment-card').forEach(card => {
+            card.addEventListener('click', function (e) {
+                if (e.target.closest('.btn')) return;
+                const clientName = this.querySelector('h4').textContent;
+                showNotification(`Viewing full session details for ${clientName}`, 'info');
+            });
+        });
+
+        // CTA button interaction
+        document.querySelector('.cta-button').addEventListener('click', function () {
+            showNotification('Opening scheduling calendar...', 'success');
+        });
+    });
+
+    function showNotification(message, type = 'info') {
+        // Remove any existing notifications
+        const existingNotifications = document.querySelectorAll('.notification');
+        existingNotifications.forEach(notification => notification.remove());
+
+        const bgColor = type === 'success' ? '#10b981' : '#4f46e5';
+
+        const notification = document.createElement('div');
+        notification.className = 'notification fixed top-4 right-4 text-white px-4 py-3 rounded-lg shadow-lg z-50';
+        notification.style.background = bgColor;
+        notification.innerHTML = `
+                                <div class="flex items-center gap-2">
+                                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
+                                    <span class="font-medium">${message}</span>
+                                </div>
+                                `;
+        document.body.appendChild(notification);
+
+        // Remove notification after 3 seconds
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+</script>
+{% endblock %}

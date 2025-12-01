@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - MindEase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #06b6d4;
+            --accent: #8b5cf6;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --text: #475569;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .animate-slide-up {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideUp 0.6s ease forwards;
+        }
+        
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in {
+            opacity: 0;
+            animation: fadeIn 0.8s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .animate-pulse-slow {
+            animation: pulse 3s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .btn-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .input-focus:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .floating-label {
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .input-field:focus + .floating-label,
+        .input-field:not(:placeholder-shown) + .floating-label {
+            transform: translateY(-24px) scale(0.85);
+            color: var(--primary);
+            background: white;
+            padding: 0 8px;
+            margin-left: 4px;
+        }
+        
+        .error-message {
+            color: var(--error);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        
+        .input-error {
+            border-color: var(--error);
+        }
+        
+        .success-check {
+            color: var(--success);
+        }
+        
+        .warning-alert {
+            color: var(--warning);
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(79, 70, 229, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid #e2e8f0;
+        }
+
+        .modal-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.75rem;
+        }
+
+        .modal-icon.success {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .modal-icon.error {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .modal-icon.warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .modal-icon.info {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .modal-icon.progress {
+            background: #f0f9ff;
+            color: #0ea5e9;
+        }
+
+        /* Loader Styles */
+        .form-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .loader-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            text-align: center;
+            min-width: 320px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid #e2e8f0;
+        }
+
+        .loader-text {
+            margin-top: 1.5rem;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+                align-items: flex-start;
+            }
+            
+            .modal-content {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .button-group button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- CSRF Token Hidden Field -->
+    <input type="hidden" id="csrf-token" name="csrfmiddlewaretoken" value="">
+
+    <!-- Login Container -->
+    <div class="max-w-6xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden animate-fade-in my-8">
+        <div class="flex flex-col lg:flex-row min-h-[600px]">
+            <!-- Left Side - Visual & Info -->
+            <div class="lg:w-2/5 bg-gradient-to-br from-indigo-600 to-purple-700 text-white p-8 lg:p-12 flex flex-col">
+                <div class="flex-1">
+                    <a href="/" class="inline-flex items-center text-white mb-8 animate-slide-up">
+                        <div class="h-10 w-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center mr-3">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <span class="text-xl font-bold">MindEase</span>
+                    </a>
+                    
+                    <h1 class="text-3xl font-bold mb-4 animate-slide-up">Welcome Back</h1>
+                    <p class="text-indigo-100 mb-6 animate-slide-up">Continue your mental wellness journey with MindEase. Your path to better mental health continues here.</p>
+                    
+                    <div class="space-y-4 mt-8">
+                        <div class="flex items-center animate-slide-up">
+                            <div class="w-8 h-8 rounded-full bg-white bg-opacity-20 flex items-center justify-center mr-3">
+                                <i class="fas fa-shield-alt text-sm"></i>
+                            </div>
+                            <span>Secure & Confidential Sessions</span>
+                        </div>
+                        <div class="flex items-center animate-slide-up">
+                            <div class="w-8 h-8 rounded-full bg-white bg-opacity-20 flex items-center justify-center mr-3">
+                                <i class="fas fa-user-md text-sm"></i>
+                            </div>
+                            <span>Licensed Professional Therapists</span>
+                        </div>
+                        <div class="flex items-center animate-slide-up">
+                            <div class="w-8 h-8 rounded-full bg-white bg-opacity-20 flex items-center justify-center mr-3">
+                                <i class="fas fa-clock text-sm"></i>
+                            </div>
+                            <span>Flexible Scheduling 24/7</span>
+                        </div>
+                        <div class="flex items-center animate-slide-up">
+                            <div class="w-8 h-8 rounded-full bg-white bg-opacity-20 flex items-center justify-center mr-3">
+                                <i class="fas fa-laptop text-sm"></i>
+                            </div>
+                            <span>Online Sessions via Google Meet</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8 animate-fade-in">
+                    <div class="bg-white bg-opacity-10 rounded-xl p-4 backdrop-blur-sm">
+                        <div class="flex items-start">
+                            <div class="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center mr-4 flex-shrink-0 mt-1">
+                                <i class="fas fa-quote-left"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm italic">"MindEase has been transformative for my mental health. The therapists are compassionate and truly understand my needs."</p>
+                                <p class="text-sm mt-2 text-indigo-200">- Sarah M., Client for 8 months</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Side - Login Form -->
+            <div class="lg:w-3/5 p-6 lg:p-12 overflow-y-auto max-h-[600px]">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl lg:text-3xl font-bold text-slate-800">Welcome Back</h2>
+                    <p class="text-slate-600 mt-2">Sign in to your MindEase account</p>
+                </div>
+                
+                <!-- Login Form -->
+                <form id="login-form" class="max-w-md mx-auto">
+                    <!-- Error Message -->
+                    <div id="form-error" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 hidden">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-exclamation-circle text-red-600"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800" id="error-message">Invalid email or password</h3>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Success Message (for password reset, etc.) -->
+                    <div id="form-success" class="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 hidden">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-check-circle text-green-600"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-green-800" id="success-message">Password reset email sent successfully</h3>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-5">
+                        <div class="relative">
+                            <input type="email" id="email" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus input-field transition-all" placeholder=" " required>
+                            <label for="email" class="floating-label absolute left-4 top-3 text-slate-500 bg-white">Email Address</label>
+                            <div class="error-message" id="email-error">Please enter a valid email address</div>
+                        </div>
+                        
+                        <div class="relative">
+                            <input type="password" id="password" class="w-full px-4 py-3 pr-10 border border-slate-300 rounded-lg input-focus input-field password-field transition-all" placeholder=" " required>
+                            <label for="password" class="floating-label absolute left-4 top-3 text-slate-500 bg-white">Password</label>
+                            <button type="button" id="toggle-password" class="absolute right-3 top-3 text-slate-500 hover:text-slate-700">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <div class="error-message" id="password-error">Please enter your password</div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="remember-me" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded">
+                                <label for="remember-me" class="ml-2 block text-sm text-slate-700">Remember me</label>
+                            </div>
+                            
+                            <a href="#" id="forgot-password" class="text-sm text-indigo-600 hover:text-indigo-500 font-medium">Forgot password?</a>
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-indigo-600 text-white py-3.5 rounded-lg font-medium btn-hover pulse-glow">
+                            <span id="login-text">Sign In</span>
+                            <div id="login-spinner" class="hidden inline-flex items-center">
+                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Signing in...
+                            </div>
+                        </button>
+                    </div>
+                    
+                    <!-- Forgot Password Modal -->
+                    <div id="forgot-password-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                        <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 animate-slide-up">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-slate-800">Reset Your Password</h3>
+                                <button type="button" id="close-modal" class="text-slate-500 hover:text-slate-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            
+                            <p class="text-slate-600 mb-4">Enter your email address and we'll send you a link to reset your password.</p>
+                            
+                            <div class="space-y-4">
+                                <div class="relative">
+                                    <input type="email" id="reset-email" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus transition-all" placeholder="Enter your email">
+                                    <div class="error-message" id="reset-email-error">Please enter a valid email address</div>
+                                </div>
+                                
+                                <button type="button" id="send-reset-link" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium btn-hover">
+                                    Send Reset Link
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="mt-8 text-center border-t border-slate-200 pt-6">
+                    <p class="text-slate-600">Don't have an account? <a href="/accounts/register/" class="text-indigo-600 font-medium hover:text-indigo-500">Sign up here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal-overlay hidden">
+        <div class="modal-content animate-slide-up">
+            <div class="modal-icon success">
+                <i class="fas fa-check"></i>
+            </div>
+            
+            <h3 class="text-xl font-bold text-slate-800 text-center mb-2" id="success-title">Login Successful!</h3>
+            <p class="text-slate-600 text-center mb-6" id="success-message-text">You have been successfully logged in.</p>
+            
+            <div class="flex space-x-4">
+                <button id="success-ok-btn" class="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium btn-hover">
+                    Continue to Home
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Not Verified Modal -->
+    <div id="email-not-verified-modal" class="modal-overlay hidden">
+        <div class="modal-content animate-slide-up">
+            <div class="modal-icon warning">
+                <i class="fas fa-envelope"></i>
+            </div>
+            
+            <h3 class="text-xl font-bold text-slate-800 text-center mb-2">Email Verification Required</h3>
+            <p class="text-slate-600 text-center mb-6" id="email-not-verified-message">Please verify your email address to continue using MindEase.</p>
+            
+            <div class="flex space-x-4">
+                <button id="go-to-verify-btn" class="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium btn-hover">
+                    Go to Verification Page
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Background Verification Pending Modal -->
+    <div id="background-verification-pending-modal" class="modal-overlay hidden">
+        <div class="modal-content animate-slide-up">
+            <div class="modal-icon info">
+                <i class="fas fa-clock"></i>
+            </div>
+            
+            <h3 class="text-xl font-bold text-slate-800 text-center mb-2">Account Under Review</h3>
+            <p class="text-slate-600 text-center mb-6">Your background verification is pending approval. We will notify you via email once your account is activated. This process usually takes 2-3 business days.</p>
+            
+            <div class="flex space-x-4">
+                <button id="background-pending-ok-btn" class="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium btn-hover">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Background Verification Rejected Modal -->
+    <div id="background-verification-rejected-modal" class="modal-overlay hidden">
+        <div class="modal-content animate-slide-up">
+            <div class="modal-icon error">
+                <i class="fas fa-times"></i>
+            </div>
+            
+            <h3 class="text-xl font-bold text-slate-800 text-center mb-2">Application Not Approved</h3>
+            <p class="text-slate-600 text-center mb-6">We're unable to approve your counsellor application at this time. This may be due to incomplete or unclear documentation. You may create a new account with proper and clear documents to reapply.</p>
+            
+            <div class="flex space-x-4">
+                <button id="create-new-account-btn" class="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium btn-hover">
+                    Create New Account
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loader -->
+    <div id="form-loader" class="form-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <div class="loader-text">Signing you in...</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get CSRF token function
+            function getCSRFToken() {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, 'csrftoken'.length + 1) === ('csrftoken' + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring('csrftoken'.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            // Set CSRF token in hidden field
+            document.getElementById('csrf-token').value = getCSRFToken();
+
+            // DOM Elements
+            const loginForm = document.getElementById('login-form');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const togglePasswordBtn = document.getElementById('toggle-password');
+            const rememberMeCheckbox = document.getElementById('remember-me');
+            const forgotPasswordLink = document.getElementById('forgot-password');
+            const forgotPasswordModal = document.getElementById('forgot-password-modal');
+            const closeModalBtn = document.getElementById('close-modal');
+            const resetEmailInput = document.getElementById('reset-email');
+            const sendResetLinkBtn = document.getElementById('send-reset-link');
+            const loginBtn = document.getElementById('login-form').querySelector('button[type="submit"]');
+            const loginText = document.getElementById('login-text');
+            const loginSpinner = document.getElementById('login-spinner');
+            const formError = document.getElementById('form-error');
+            const formSuccess = document.getElementById('form-success');
+            const formLoader = document.getElementById('form-loader');
+
+            // Modal Elements
+            const successModal = document.getElementById('success-modal');
+            const emailNotVerifiedModal = document.getElementById('email-not-verified-modal');
+            const backgroundVerificationPendingModal = document.getElementById('background-verification-pending-modal');
+            const backgroundVerificationRejectedModal = document.getElementById('background-verification-rejected-modal');
+
+            // Modal Button Elements
+            const successOkBtn = document.getElementById('success-ok-btn');
+            const goToVerifyBtn = document.getElementById('go-to-verify-btn');
+            const backgroundPendingOkBtn = document.getElementById('background-pending-ok-btn');
+            const createNewAccountBtn = document.getElementById('create-new-account-btn');
+
+            // Toggle password visibility
+            togglePasswordBtn.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Toggle eye icon
+                const icon = this.querySelector('i');
+                if (type === 'password') {
+                    icon.className = 'fas fa-eye';
+                } else {
+                    icon.className = 'fas fa-eye-slash';
+                }
+            });
+            
+            // Forgot password modal
+            forgotPasswordLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                forgotPasswordModal.classList.remove('hidden');
+            });
+            
+            closeModalBtn.addEventListener('click', function() {
+                forgotPasswordModal.classList.add('hidden');
+            });
+            
+            // Send reset link
+            sendResetLinkBtn.addEventListener('click', function() {
+                const email = resetEmailInput.value.trim();
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                
+                // Validate email
+                if (!email || !emailRegex.test(email)) {
+                    showError('reset-email-error', 'Please enter a valid email address');
+                    resetEmailInput.classList.add('input-error');
+                    return;
+                }
+                
+                // Hide error
+                hideError('reset-email-error');
+                resetEmailInput.classList.remove('input-error');
+                
+                // Show loading state
+                const originalText = sendResetLinkBtn.textContent;
+                sendResetLinkBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Sending...';
+                sendResetLinkBtn.disabled = true;
+                
+                // Send reset password request
+                fetch('/accounts/password-reset-request/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken(),
+                    },
+                    body: JSON.stringify({
+                        email: email
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    // Reset button
+                    sendResetLinkBtn.textContent = originalText;
+                    sendResetLinkBtn.disabled = false;
+                    
+                    if (data.success) {
+                        // Close modal
+                        forgotPasswordModal.classList.add('hidden');
+                        
+                        console.log('here')
+                        // Show success message
+                        showSuccess('Password reset link sent! Check your email.');
+                        
+                        // Clear input
+                        resetEmailInput.value = '';
+                    } else {
+                        showError('reset-email-error', data.error || 'Failed to send reset link');
+                        resetEmailInput.classList.add('input-error');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    sendResetLinkBtn.textContent = originalText;
+                    sendResetLinkBtn.disabled = false;
+                    showError('reset-email-error', 'Network error. Please try again.');
+                    resetEmailInput.classList.add('input-error');
+                });
+            });
+            
+            // Form validation
+            function validateForm() {
+                let isValid = true;
+                const email = emailInput.value.trim();
+                const password = passwordInput.value.trim();
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                
+                // Hide any previous messages
+                hideFormMessages();
+                
+                // Validate email
+                if (!email || !emailRegex.test(email)) {
+                    showError('email-error', 'Please enter a valid email address');
+                    emailInput.classList.add('input-error');
+                    isValid = false;
+                } else {
+                    hideError('email-error');
+                    emailInput.classList.remove('input-error');
+                }
+                
+                // Validate password
+                if (!password) {
+                    showError('password-error', 'Please enter your password');
+                    passwordInput.classList.add('input-error');
+                    isValid = false;
+                } else {
+                    hideError('password-error');
+                    passwordInput.classList.remove('input-error');
+                }
+                
+                return isValid;
+            }
+            
+            // Form submission
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (validateForm()) {
+                    // Show loading state
+                    loginText.classList.add('hidden');
+                    loginSpinner.classList.remove('hidden');
+                    loginBtn.disabled = true;
+                    formLoader.style.display = 'flex';
+                    
+                    // Prepare login data
+                    const loginData = {
+                        email: emailInput.value.trim(),
+                        password: passwordInput.value.trim(),
+                        remember_me: rememberMeCheckbox.checked
+                    };
+                    
+                    // Send login request
+                    fetch('/accounts/login/user/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCSRFToken(),
+                        },
+                        body: JSON.stringify(loginData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Reset button state
+                        loginText.classList.remove('hidden');
+                        loginSpinner.classList.add('hidden');
+                        loginBtn.disabled = false;
+                        formLoader.style.display = 'none';
+                        
+                        if (data.success) {
+                            // Show success modal
+                            showSuccessModal(data.message, data.redirect_url);
+                        } else {
+                            // Handle different error types
+                            handleLoginError(data.error, data.error_type);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        loginText.classList.remove('hidden');
+                        loginSpinner.classList.add('hidden');
+                        loginBtn.disabled = false;
+                        formLoader.style.display = 'none';
+                        showFormError('Network error. Please try again.');
+                    });
+                }
+            });
+            
+            // Handle different login error types
+            function handleLoginError(errorMessage, errorType) {
+                switch(errorType) {
+                    case 'email_not_verified':
+                        showEmailNotVerifiedModal();
+                        break;
+                    case 'background_verification_pending':
+                        showBackgroundVerificationPendingModal();
+                        break;
+                    case 'background_verification_rejected':
+                        showBackgroundVerificationRejectedModal();
+                        break;
+                    default:
+                        showFormError(errorMessage || 'Invalid email or password');
+                }
+            }
+            
+            // Show success modal
+            function showSuccessModal(message, redirectUrl) {
+                document.getElementById('success-message-text').textContent = message;
+                successModal.classList.remove('hidden');
+                
+                // Set up redirect
+                successOkBtn.onclick = function() {
+                    if (redirectUrl) {
+                        window.location.href = '/';
+                    } else {
+                        window.location.href = '/';
+                    }
+                };
+            }
+            
+            // Show email not verified modal
+            function showEmailNotVerifiedModal() {
+                emailNotVerifiedModal.classList.remove('hidden');
+            }
+            
+            // Show background verification pending modal
+            function showBackgroundVerificationPendingModal() {
+                backgroundVerificationPendingModal.classList.remove('hidden');
+            }
+            
+            // Show background verification rejected modal
+            function showBackgroundVerificationRejectedModal() {
+                backgroundVerificationRejectedModal.classList.remove('hidden');
+            }
+
+
+            // Go to verification page - Using fetch API
+            goToVerifyBtn.addEventListener('click', function() {
+                const email = emailInput.value.trim();
+                if (email) {
+                    // Show loading state
+                    formLoader.style.display = 'flex';
+                    
+                    // Send POST request with email
+                    fetch('/accounts/email_verify/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': getCSRFToken(),
+                        },
+                        body: `email=${encodeURIComponent(email)}&csrfmiddlewaretoken=${getCSRFToken()}`
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // Redirect to the verification page
+                            window.location.href = '/accounts/email_verify/';
+                        } else {
+                            // Fallback to GET if POST fails
+                            window.location.href = '/accounts/email_verify/';
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        // Fallback to GET if POST fails
+                        window.location.href = '/accounts/email_verify/';
+                    })
+                    .finally(() => {
+                        formLoader.style.display = 'none';
+                    });
+                } else {
+                    // If no email, redirect without email
+                    window.location.href = '/accounts/email_verify/';
+                }
+            });
+
+            
+            // Background pending OK button
+            backgroundPendingOkBtn.addEventListener('click', function() {
+                backgroundVerificationPendingModal.classList.add('hidden');
+            });
+            
+            // Create new account button
+            createNewAccountBtn.addEventListener('click', function() {
+                backgroundVerificationRejectedModal.classList.add('hidden');
+                window.location.href = '/accounts/register/';
+            });
+            
+            // Helper functions
+            function showError(elementId, message) {
+                const errorElement = document.getElementById(elementId);
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+            
+            function hideError(elementId) {
+                const errorElement = document.getElementById(elementId);
+                errorElement.style.display = 'none';
+            }
+            
+            function showFormError(message) {
+                formError.classList.remove('hidden');
+                document.getElementById('error-message').textContent = message;
+            }
+            
+            function showSuccess(message) {
+                formSuccess.classList.remove('hidden');
+                document.getElementById('success-message').textContent = message;
+                
+                // Auto-hide success message after 5 seconds
+                setTimeout(() => {
+                    formSuccess.classList.add('hidden');
+                }, 5000);
+            }
+            
+            function hideFormMessages() {
+                formError.classList.add('hidden');
+                formSuccess.classList.add('hidden');
+            }
+            
+            // Input field animations
+            document.querySelectorAll('.input-field').forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.classList.add('ring-2', 'ring-indigo-500', 'ring-opacity-50');
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.classList.remove('ring-2', 'ring-indigo-500', 'ring-opacity-50');
+                });
+            });
+            
+            // Add smooth animations to elements as they come into view
+            const animatedElements = document.querySelectorAll('.animate-slide-up', '.animate-fade-in');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            animatedElements.forEach(element => {
+                observer.observe(element);
+            });
+        });
+    </script>
+</body>
+</html>

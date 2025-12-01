@@ -1,0 +1,3251 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - MindEase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #06b6d4;
+            --accent: #8b5cf6;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --text: #475569;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .animate-slide-up {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideUp 0.6s ease forwards;
+        }
+        
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in {
+            opacity: 0;
+            animation: fadeIn 0.8s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .animate-pulse-slow {
+            animation: pulse 3s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .form-transition {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .input-focus:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .btn-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .role-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+        
+        .role-card:hover {
+            transform: translateY(-8px);
+        }
+        
+        .role-card.selected {
+            border-color: var(--primary);
+            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.3);
+            transform: scale(1.02);
+        }
+        
+        .step-indicator {
+            transition: all 0.3s ease;
+        }
+        
+        .step-indicator.active {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .step-indicator.completed {
+            background: var(--success);
+            color: white;
+        }
+        
+        .floating-label {
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .input-field:focus + .floating-label,
+        .input-field:not(:placeholder-shown) + .floating-label {
+            transform: translateY(-24px) scale(0.85);
+            color: var(--primary);
+            background: white;
+            padding: 0 8px;
+            margin-left: 4px;
+        }
+        
+        .form-section {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .form-section.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .password-strength {
+            height: 4px;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .password-strength.weak {
+            background: var(--error);
+            width: 25%;
+        }
+        
+        .password-strength.medium {
+            background: #f59e0b;
+            width: 50%;
+        }
+        
+        .password-strength.strong {
+            background: var(--success);
+            width: 100%;
+        }
+        
+        .error-message {
+            color: var(--error);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        
+        .input-error {
+            border-color: var(--error);
+        }
+        
+        .file-hover:hover {
+            background-color: #f1f5f9;
+            border-color: #94a3b8;
+        }
+        
+        .checkbox-custom:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .specialization-checkbox {
+            transition: all 0.3s ease;
+        }
+        
+        .specialization-checkbox:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .specialization-tag {
+            display: inline-flex;
+            align-items: center;
+            background-color: #e0e7ff;
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        /* Progress Bar Styles - Thin line with circular indicators */
+        .progress-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+        
+        .progress-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e5e7eb;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+        
+        .steps-container {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            z-index: 2;
+        }
+        
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        
+        .step-indicator {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #6b7280;
+            transition: all 0.3s ease;
+            border: 2px solid white;
+            z-index: 3;
+        }
+        
+        .step-indicator.active {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .step-indicator.completed {
+            background: var(--success);
+            color: white;
+        }
+        
+        .step-label {
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: #6b7280;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .step-item.active .step-label {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .step-item.completed .step-label {
+            color: var(--success);
+        }
+        
+        .step-number {
+            display: block;
+        }
+        
+        .step-check {
+            display: none;
+        }
+        
+        .step-indicator.completed .step-number {
+            display: none;
+        }
+        
+        .step-indicator.completed .step-check {
+            display: block;
+        }
+
+        /* Profile Picture Upload Styles */
+        .profile-picture-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .profile-picture-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            border: 3px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        
+        .profile-picture-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .profile-picture-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #94a3b8;
+        }
+        
+        .profile-picture-placeholder i {
+            font-size: 2.5rem;
+        }
+        
+        .profile-upload-btn {
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .profile-upload-btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Session fee field with rupee symbol */
+        .session-fee-container {
+            position: relative;
+        }
+        
+        .session-fee-symbol {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            font-weight: 500;
+            z-index: 10;
+        }
+        
+        .session-fee-input {
+            padding-left: 30px;
+        }
+
+        /* Form Loader Styles */
+        .form-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .loader-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            text-align: center;
+            min-width: 320px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid #e2e8f0;
+        }
+
+        .loader-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-text {
+            margin-top: 1.5rem;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+                align-items: flex-start;
+            }
+            
+            .step-label {
+                font-size: 0.7rem;
+            }
+            
+            .step-indicator {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+            }
+            
+            .profile-picture-preview {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- CSRF Token Hidden Field -->
+    <input type="hidden" id="csrf-token" name="csrfmiddlewaretoken" value="">
+
+    <!-- Registration Container -->
+    <div class="max-w-6xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden animate-fade-in my-8">
+        <div class="flex flex-col lg:flex-row min-h-[600px]">
+            <!-- Left Side - Visual & Info -->
+            <div class="lg:w-2/5 bg-gradient-to-br from-indigo-600 to-purple-700 text-white p-8 lg:p-12 flex flex-col">
+                <div class="flex-1">
+                    <a href="index.html" class="inline-flex items-center text-white mb-8 animate-slide-up">
+                        <div class="h-10 w-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center mr-3">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <span class="text-xl font-bold">MindEase</span>
+                    </a>
+                    
+                    <h1 class="text-3xl font-bold mb-4 animate-slide-up">Begin Your Wellness Journey</h1>
+                    <p class="text-indigo-100 mb-6 animate-slide-up">Join our community of mental health professionals and individuals committed to personal growth and wellbeing.</p>
+                    
+                    <div class="space-y-4 mt-8">
+                        <div class="flex items-center animate-slide-up">
+                            <div class="w-8 h-8 rounded-full bg-white bg-opacity-20 flex items-center justify-center mr-3">
+                                <i class="fas fa-shield-alt text-sm"></i>
+                            </div>
+                            <span>Secure & Confidential Sessions</span>
+                        </div>
+                        <div class="flex items-center animate-slide-up">
+                            <div class="w-8 h-8 rounded-full bg-white bg-opacity-20 flex items-center justify-center mr-3">
+                                <i class="fas fa-user-md text-sm"></i>
+                            </div>
+                            <span>Licensed Professional Therapists</span>
+                        </div>
+                        <div class="flex items-center animate-slide-up">
+                            <div class="w-8 h-8 rounded-full bg-white bg-opacity-20 flex items-center justify-center mr-3">
+                                <i class="fas fa-clock text-sm"></i>
+                            </div>
+                            <span>Flexible Scheduling</span>
+                        </div>
+                        <div class="flex items-center animate-slide-up">
+                            <div class="w-8 h-8 rounded-full bg-white bg-opacity-20 flex items-center justify-center mr-3">
+                                <i class="fas fa-laptop text-sm"></i>
+                            </div>
+                            <span>Online Sessions via Google Meet</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8 animate-fade-in">
+                    <div class="bg-white bg-opacity-10 rounded-xl p-4 backdrop-blur-sm">
+                        <div class="flex items-start">
+                            <div class="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center mr-4 flex-shrink-0 mt-1">
+                                <i class="fas fa-quote-left"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm italic">"The registration process was seamless, and I was matched with a therapist who truly understands my needs. MindEase has been life-changing."</p>
+                                <p class="text-sm mt-2 text-indigo-200">- Michael T., Client for 6 months</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Side - Registration Form -->
+            <div class="lg:w-3/5 p-6 lg:p-12 overflow-y-auto max-h-[600px]">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl lg:text-3xl font-bold text-slate-800">Create Your Account</h2>
+                    <p class="text-slate-600 mt-2">Join thousands on their mental wellness journey</p>
+                </div>
+                
+                <!-- Progress Bar Container -->
+                <div class="progress-container max-w-2xl mx-auto mb-8">
+                    <!-- Client Progress Bar (Initially hidden) -->
+                    <div id="client-progress" class="hidden">
+                        <div class="progress-line"></div>
+                        <div class="steps-container">
+                            <div class="step-item active" data-step="1">
+                                <div class="step-indicator active">
+                                    <span class="step-number">1</span>
+                                    <i class="fas fa-check step-check"></i>
+                                </div>
+                                <div class="step-label">Role</div>
+                            </div>
+                            <div class="step-item" data-step="2">
+                                <div class="step-indicator">
+                                    <span class="step-number">2</span>
+                                    <i class="fas fa-check step-check"></i>
+                                </div>
+                                <div class="step-label">Basic Info</div>
+                            </div>
+                            <div class="step-item" data-step="3">
+                                <div class="step-indicator">
+                                    <span class="step-number">3</span>
+                                    <i class="fas fa-check step-check"></i>
+                                </div>
+                                <div class="step-label">Details</div>
+                            </div>
+                            <div class="step-item" data-step="4">
+                                <div class="step-indicator">
+                                    <span class="step-number">4</span>
+                                    <i class="fas fa-check step-check"></i>
+                                </div>
+                                <div class="step-label">About</div>
+                            </div>
+                            <div class="step-item" data-step="5">
+                                <div class="step-indicator">
+                                    <span class="step-number">5</span>
+                                    <i class="fas fa-check step-check"></i>
+                                </div>
+                                <div class="step-label">Terms</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Counsellor Progress Bar (Initially hidden) -->
+                    <div id="counsellor-progress" class="hidden">
+                        <div class="progress-line"></div>
+                        <div class="steps-container">
+                            <div class="step-item active" data-step="1">
+                                <div class="step-indicator active">
+                                    <span class="step-number">1</span>
+                                    <i class="fas fa-check step-check"></i>
+                                </div>
+                                <div class="step-label">Role</div>
+                            </div>
+                            <div class="step-item" data-step="2">
+                                <div class="step-indicator">
+                                    <span class="step-number">2</span>
+                                    <i class="fas fa-check step-check"></i>
+                                </div>
+                                <div class="step-label">Basic Info</div>
+                            </div>
+                            <div class="step-item" data-step="3">
+                                <div class="step-indicator">
+                                    <span class="step-number">3</span>
+                                    <i class="fas fa-check step-check"></i>
+                                </div>
+                                <div class="step-label">Professional</div>
+                            </div>
+                            <div class="step-item" data-step="4">
+                                <div class="step-indicator">
+                                    <span class="step-number">4</span>
+                                    <i class="fas fa-check step-check"></i>
+                                </div>
+                                <div class="step-label">Practice</div>
+                            </div>
+                            <div class="step-item" data-step="5">
+                                <div class="step-indicator">
+                                    <span class="step-number">5</span>
+                                    <i class="fas fa-check step-check"></i>
+                                </div>
+                                <div class="step-label">Certifications</div>
+                            </div>
+                            <div class="step-item" data-step="6">
+                                <div class="step-indicator">
+                                    <span class="step-number">6</span>
+                                    <i class="fas fa-check step-check"></i>
+                                </div>
+                                <div class="step-label">Documents</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 1: Role Selection -->
+                <div id="step-1" class="form-section active">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-6 text-center">Select Your Role</h3>
+                    
+                    <!-- Role Selection Error Message -->
+                    <div class="error-message text-center mb-4" id="role-error" style="display: none;">Please select your role</div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        <div class="role-card border-2 border-slate-200 rounded-xl p-6 text-center" data-role="client">
+                            <div class="w-16 h-16 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mx-auto mb-4 text-2xl">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h4 class="font-semibold text-slate-800 mb-2">I'm a Client</h4>
+                            <p class="text-slate-600 text-sm">Seeking mental health support and therapy sessions</p>
+                            <div class="mt-4 text-indigo-600 hidden">
+                                <i class="fas fa-check-circle"></i> Selected
+                            </div>
+                        </div>
+                        
+                        <div class="role-card border-2 border-slate-200 rounded-xl p-6 text-center" data-role="counsellor">
+                            <div class="w-16 h-16 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mx-auto mb-4 text-2xl">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                            <h4 class="font-semibold text-slate-800 mb-2">I'm a Counsellor</h4>
+                            <p class="text-slate-600 text-sm">Licensed professional providing therapy services</p>
+                            <div class="mt-4 text-indigo-600 hidden">
+                                <i class="fas fa-check-circle"></i> Selected
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <button type="button" class="next-step bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium btn-hover">
+                            Continue <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 2: Basic Information -->
+                <div id="step-2" class="form-section">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-6">Basic Information</h3>
+                    
+                    <div class="space-y-5">
+                        <!-- Profile Picture Upload -->
+                        <div class="profile-picture-container">
+                            <div class="profile-picture-preview" id="profile-picture-preview">
+                                <div class="profile-picture-placeholder">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                            </div>
+                            <input type="file" id="profile-picture" class="hidden" accept="image/*">
+                            <button type="button" class="profile-upload-btn" id="profile-upload-btn">
+                                <i class="fas fa-camera mr-2"></i> Upload Profile Picture
+                            </button>
+                            <div class="error-message" id="profile-picture-error">Please upload a profile picture</div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="relative">
+                                <input type="text" id="first-name" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus input-field transition-all" placeholder=" " required>
+                                <label for="first-name" class="floating-label absolute left-4 top-3 text-slate-500 bg-white">First Name</label>
+                                <div class="error-message" id="first-name-error">Please enter your first name</div>
+                            </div>
+                            
+                            <div class="relative">
+                                <input type="text" id="last-name" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus input-field transition-all" placeholder=" " required>
+                                <label for="last-name" class="floating-label absolute left-4 top-3 text-slate-500 bg-white">Last Name</label>
+                                <div class="error-message" id="last-name-error">Please enter your last name</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Gender Field -->
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Gender</label>
+                            <select id="gender" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus transition-all" required>
+                                <option value="">Select your gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <div class="error-message" id="gender-error">Please select your gender</div>
+                        </div>
+                        
+                        <div class="relative">
+                            <input type="email" id="email" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus input-field transition-all" placeholder=" " required>
+                            <label for="email" class="floating-label absolute left-4 top-3 text-slate-500 bg-white">Email Address</label>
+                            <div class="error-message" id="email-error">Please enter a valid email address</div>
+                        </div>
+                        
+                        <div class="relative">
+                            <input type="tel" id="phone" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus input-field transition-all" placeholder=" " required>
+                            <label for="phone" class="floating-label absolute left-4 top-3 text-slate-500 bg-white">Phone Number</label>
+                            <div class="error-message" id="phone-error">Please enter a valid 10-digit phone number</div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="relative">
+                                <input type="password" id="password" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus input-field transition-all password-field" placeholder=" " required>
+                                <label for="password" class="floating-label absolute left-4 top-3 text-slate-500 bg-white">Password</label>
+                                <div class="error-message" id="password-error">Password must be at least 8 characters</div>
+                                <div class="mt-2">
+                                    <div class="password-strength weak"></div>
+                                    <div class="text-xs text-slate-500 mt-1" id="password-strength-text">Weak password</div>
+                                </div>
+                            </div>
+                            
+                            <div class="relative">
+                                <input type="password" id="confirm-password" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus input-field transition-all password-field" placeholder=" " required>
+                                <label for="confirm-password" class="floating-label absolute left-4 top-3 text-slate-500 bg-white">Confirm Password</label>
+                                <div class="error-message" id="confirm-password-error">Passwords do not match</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <input type="checkbox" id="show-password" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded">
+                            <label for="show-password" class="ml-2 block text-sm text-slate-700">Show passwords</label>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between mt-8">
+                        <button type="button" class="prev-step bg-slate-200 text-slate-700 px-6 py-3 rounded-lg font-medium btn-hover">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <button type="button" class="next-step bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium btn-hover">
+                            Continue <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 3: Client Information -->
+                <div id="step-3-client" class="form-section">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-6">Additional Information</h3>
+                    
+                    <div class="space-y-5">
+                        <!-- Date of Birth Field -->
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Date of Birth</label>
+                            <input type="date" id="date-of-birth" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus transition-all" required>
+                            <div class="error-message" id="date-of-birth-error">Please enter your date of birth</div>
+                            <p class="text-xs text-slate-500 mt-1">You must be at least 18 years old to register</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Primary Concern</label>
+                            <select id="client-primary-concern" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus transition-all" required>
+                                <option value="">What brings you here today?</option>
+                                <option value="anxiety">Anxiety & Stress</option>
+                                <option value="depression">Depression</option>
+                                <option value="relationship">Relationship Issues</option>
+                                <option value="trauma">Trauma & PTSD</option>
+                                <option value="self_improvement">Self-Improvement</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <div class="error-message" id="client-primary-concern-error">Please select your primary concern</div>
+                        </div>
+
+                        <!-- Other Primary Concern Field (Hidden by default) -->
+                        <div id="other-primary-concern-container" class="hidden">
+                            <div class="relative">
+                                <input type="text" id="other-primary-concern" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus input-field transition-all" placeholder=" ">
+                                <label for="other-primary-concern" class="floating-label absolute left-4 top-3 text-slate-500 bg-white">Specify Your Primary Concern</label>
+                                <div class="error-message" id="other-primary-concern-error">Please specify your primary concern</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between mt-8">
+                        <button type="button" class="prev-step bg-slate-200 text-slate-700 px-6 py-3 rounded-lg font-medium btn-hover">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <button type="button" class="next-step bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium btn-hover">
+                            Continue <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 4: Client About Me -->
+                <div id="step-4-client" class="form-section">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-6">About Me</h3>
+                    
+                    <div class="space-y-5">
+                        <!-- About Me Field -->
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">About Me</label>
+                            <textarea id="client-about-me" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus transition-all h-32 resize-none" placeholder="Tell us a bit about yourself, your interests, and what you hope to achieve through therapy..." required></textarea>
+                            <div class="text-xs text-slate-500 mt-1">This helps us match you with the right therapist</div>
+                            <div class="error-message" id="client-about-me-error">Please tell us a bit about yourself</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between mt-8">
+                        <button type="button" class="prev-step bg-slate-200 text-slate-700 px-6 py-3 rounded-lg font-medium btn-hover">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <button type="button" class="next-step bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium btn-hover">
+                            Continue <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 3: Counsellor Professional Information -->
+                <div id="step-3-counsellor" class="form-section">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-6">Professional Information</h3>
+                    
+                    <div class="space-y-5">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="relative">
+                                <input type="text" id="license-number" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus input-field transition-all" placeholder=" " required>
+                                <label for="license-number" class="floating-label absolute left-4 top-3 text-slate-500 bg-white">License Number</label>
+                                <div class="error-message" id="license-number-error">Please enter your license number</div>
+                            </div>
+                            
+                            <div class="relative">
+                                <select id="license-type" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus transition-all" required>
+                                    <option value="">Select License Type</option>
+                                    <option value="clinical-psychologist">Clinical Psychologist</option>
+                                    <option value="counselling-psychologist">Counselling Psychologist</option>
+                                    <option value="psychiatrist">Psychiatrist</option>
+                                    <option value="lmhc">Licensed Mental Health Counselor</option>
+                                    <option value="lcsw">Licensed Clinical Social Worker</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <div class="error-message" id="license-type-error">Please select your license type</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Other License Type Field (Hidden by default) -->
+                        <div id="other-license-type-container" class="hidden">
+                            <div class="relative">
+                                <input type="text" id="other-license-type" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus input-field transition-all" placeholder=" ">
+                                <label for="other-license-type" class="floating-label absolute left-4 top-3 text-slate-500 bg-white">Specify License Type</label>
+                                <div class="error-message" id="other-license-type-error">Please specify your license type</div>
+                            </div>
+                        </div>
+                        
+                        <div class="relative">
+                            <input type="text" id="license-authority" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus input-field transition-all" placeholder=" " required>
+                            <label for="license-authority" class="floating-label absolute left-4 top-3 text-slate-500 bg-white">License Issuing Authority</label>
+                            <div class="error-message" id="license-authority-error">Please enter license issuing authority</div>
+                        </div>
+                        
+                        <div class="relative">
+                            <input type="date" id="license-expiry" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus input-field transition-all" placeholder=" " required>
+                            <label for="license-expiry" class="floating-label absolute left-4 top-3 text-slate-500 bg-white">License Expiry Date</label>
+                            <div class="error-message" id="license-expiry-error">Please select license expiry date</div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Specializations</label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-2">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="spec-anxiety" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded specialization-checkbox" value="Anxiety">
+                                    <label for="spec-anxiety" class="ml-2 text-sm text-slate-700">Anxiety & Stress</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="spec-depression" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded specialization-checkbox" value="Depression">
+                                    <label for="spec-depression" class="ml-2 text-sm text-slate-700">Depression</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="spec-trauma" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded specialization-checkbox" value="Trauma">
+                                    <label for="spec-trauma" class="ml-2 text-sm text-slate-700">Trauma & PTSD</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="spec-relationship" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded specialization-checkbox" value="Relationship">
+                                    <label for="spec-relationship" class="ml-2 text-sm text-slate-700">Relationship Issues</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="spec-family" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded specialization-checkbox" value="Family">
+                                    <label for="spec-family" class="ml-2 text-sm text-slate-700">Family Therapy</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="spec-addiction" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded specialization-checkbox" value="Addiction">
+                                    <label for="spec-addiction" class="ml-2 text-sm text-slate-700">Addiction</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="spec-career" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded specialization-checkbox" value="Career">
+                                    <label for="spec-career" class="ml-2 text-sm text-slate-700">Career Counseling</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="spec-self-esteem" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded specialization-checkbox" value="Self-esteem">
+                                    <label for="spec-self-esteem" class="ml-2 text-sm text-slate-700">Self-esteem</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="spec-grief" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded specialization-checkbox" value="Grief">
+                                    <label for="spec-grief" class="ml-2 text-sm text-slate-700">Grief & Loss</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="spec-eating" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded specialization-checkbox" value="Eating Disorders">
+                                    <label for="spec-eating" class="ml-2 text-sm text-slate-700">Eating Disorders</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="spec-ocd" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded specialization-checkbox" value="OCD">
+                                    <label for="spec-ocd" class="ml-2 text-sm text-slate-700">OCD</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="spec-adhd" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded specialization-checkbox" value="ADHD">
+                                    <label for="spec-adhd" class="ml-2 text-sm text-slate-700">ADHD</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="spec-anger" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded specialization-checkbox" value="Anger Management">
+                                    <label for="spec-anger" class="ml-2 text-sm text-slate-700">Anger Management</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="spec-lgbtq" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded specialization-checkbox" value="LGBTQ+ Issues">
+                                    <label for="spec-lgbtq" class="ml-2 text-sm text-slate-700">LGBTQ+ Issues</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="spec-cultural" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded specialization-checkbox" value="Cultural Issues">
+                                    <label for="spec-cultural" class="ml-2 text-sm text-slate-700">Cultural Issues</label>
+                                </div>
+                            </div>
+                            <div id="selected-specializations" class="flex flex-wrap mt-2 hidden">
+                                <!-- Selected specializations will appear here -->
+                            </div>
+                            <div class="error-message" id="specializations-error">Please select at least one specialization</div>
+                        </div>
+                        
+                        <!-- Therapy Approaches -->
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Therapy Approaches</label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-2">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="approach-cbt" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded therapy-approach-checkbox" value="CBT">
+                                    <label for="approach-cbt" class="ml-2 text-sm text-slate-700">CBT</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="approach-dbt" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded therapy-approach-checkbox" value="DBT">
+                                    <label for="approach-dbt" class="ml-2 text-sm text-slate-700">DBT</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="approach-act" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded therapy-approach-checkbox" value="ACT">
+                                    <label for="approach-act" class="ml-2 text-sm text-slate-700">ACT</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="approach-psychodynamic" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded therapy-approach-checkbox" value="Psychodynamic">
+                                    <label for="approach-psychodynamic" class="ml-2 text-sm text-slate-700">Psychodynamic</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="approach-humanistic" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded therapy-approach-checkbox" value="Humanistic">
+                                    <label for="approach-humanistic" class="ml-2 text-sm text-slate-700">Humanistic</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="approach-mindfulness" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded therapy-approach-checkbox" value="Mindfulness">
+                                    <label for="approach-mindfulness" class="ml-2 text-sm text-slate-700">Mindfulness</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="approach-solution-focused" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded therapy-approach-checkbox" value="Solution-Focused">
+                                    <label for="approach-solution-focused" class="ml-2 text-sm text-slate-700">Solution-Focused</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="approach-narrative" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded therapy-approach-checkbox" value="Narrative">
+                                    <label for="approach-narrative" class="ml-2 text-sm text-slate-700">Narrative</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="approach-gestalt" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded therapy-approach-checkbox" value="Gestalt">
+                                    <label for="approach-gestalt" class="ml-2 text-sm text-slate-700">Gestalt</label>
+                                </div>
+                            </div>
+                            <div id="selected-approaches" class="flex flex-wrap mt-2 hidden">
+                                <!-- Selected approaches will appear here -->
+                            </div>
+                            <div class="error-message" id="approaches-error">Please select at least one therapy approach</div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="relative">
+                                <input type="number" id="years-experience" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus input-field transition-all" placeholder=" " min="1" max="50" required>
+                                <label for="years-experience" class="floating-label absolute left-4 top-3 text-slate-500 bg-white">Years of Experience</label>
+                                <div class="error-message" id="years-experience-error">Please enter years of experience (1-50)</div>
+                            </div>
+                            
+                            <div class="relative">
+                                <select id="highest-degree" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus transition-all" required>
+                                    <option value="">Select Highest Degree</option>
+                                    <option value="phd">Ph.D.</option>
+                                    <option value="masters">Masters</option>
+                                    <option value="mphil">M.Phil.</option>
+                                    <option value="bachelors">Bachelors</option>
+                                    <option value="diploma">Diploma</option>
+                                </select>
+                                <div class="error-message" id="highest-degree-error">Please select your highest degree</div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="relative">
+                                <input type="text" id="university" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus input-field transition-all" placeholder=" " required>
+                                <label for="university" class="floating-label absolute left-4 top-3 text-slate-500 bg-white">University/Institution</label>
+                                <div class="error-message" id="university-error">Please enter your university/institution</div>
+                            </div>
+                            
+                            <div class="relative">
+                                <input type="number" id="graduation-year" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus input-field transition-all" placeholder=" " min="1950" max="2024" required>
+                                <label for="graduation-year" class="floating-label absolute left-4 top-3 text-slate-500 bg-white">Graduation Year</label>
+                                <div class="error-message" id="graduation-year-error">Please enter a valid graduation year (1950-2024)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between mt-8">
+                        <button type="button" class="prev-step bg-slate-200 text-slate-700 px-6 py-3 rounded-lg font-medium btn-hover">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <button type="button" class="next-step bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium btn-hover">
+                            Continue <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 4: Counsellor Practice Details -->
+                <div id="step-4-counsellor" class="form-section">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-6">Practice Details</h3>
+                    
+                    <div class="space-y-6">
+                        <!-- Session Fee -->
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Session Fee (per hour)</label>
+                            <div class="session-fee-container">
+                                <span class="session-fee-symbol">₹</span>
+                                <input type="number" id="session-fee" class="session-fee-input w-full px-6 py-3 border border-slate-300 rounded-lg input-focus transition-all" placeholder="0" min="0" required>
+                            </div>
+                            <div class="error-message" id="session-fee-error">Please enter a valid session fee</div>
+                        </div>
+                        
+                        <!-- Languages -->
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-3">Languages Spoken</label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="lang-english" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded checkbox-custom" value="English">
+                                    <label for="lang-english" class="ml-2 text-sm text-slate-700">English</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="lang-hindi" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded checkbox-custom" value="Hindi">
+                                    <label for="lang-hindi" class="ml-2 text-sm text-slate-700">Hindi</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="lang-bengali" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded checkbox-custom" value="Bengali">
+                                    <label for="lang-bengali" class="ml-2 text-sm text-slate-700">Bengali</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="lang-telugu" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded checkbox-custom" value="Telugu">
+                                    <label for="lang-telugu" class="ml-2 text-sm text-slate-700">Telugu</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="lang-marathi" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded checkbox-custom" value="Marathi">
+                                    <label for="lang-marathi" class="ml-2 text-sm text-slate-700">Marathi</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="lang-tamil" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded checkbox-custom" value="Tamil">
+                                    <label for="lang-tamil" class="ml-2 text-sm text-slate-700">Tamil</label>
+                                </div>
+                            </div>
+                            <div class="error-message" id="languages-error">Please select at least one language</div>
+                        </div>
+                        
+                        <!-- Google Meet Link -->
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Google Meet Link</label>
+                            <input type="url" id="google-meet-link" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus transition-all" placeholder="https://meet.google.com/your-meeting-code" required>
+                            <div class="error-message" id="google-meet-link-error">Please enter a valid Google Meet URL</div>
+                            <p class="text-xs text-slate-500 mt-1">Your permanent Google Meet link for all sessions</p>
+                        </div>
+                        
+                        <!-- Age Groups Served -->
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-3">Age Groups Served</label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="age-children" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded checkbox-custom" value="Children">
+                                    <label for="age-children" class="ml-2 text-sm text-slate-700">Children (6-12)</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="age-adolescents" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded checkbox-custom" value="Adolescents">
+                                    <label for="age-adolescents" class="ml-2 text-sm text-slate-700">Adolescents (13-17)</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="age-adults" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded checkbox-custom" value="Adults">
+                                    <label for="age-adults" class="ml-2 text-sm text-slate-700">Adults (18-64)</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="age-seniors" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded checkbox-custom" value="Seniors">
+                                    <label for="age-seniors" class="ml-2 text-sm text-slate-700">Seniors (65+)</label>
+                                </div>
+                            </div>
+                            <div class="error-message" id="age-groups-error">Please select at least one age group</div>
+                        </div>
+                        
+                        <!-- Professional Experience (Changed from Professional Bio) -->
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Professional Experience</label>
+                            <textarea id="professional-experience" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus transition-all h-32 resize-none" placeholder="Describe your professional background, experience, and approach to therapy..." required></textarea>
+                            <div class="text-xs text-slate-500 mt-1">Minimum 100 characters</div>
+                            <div class="error-message" id="professional-experience-error">Please enter your professional experience (minimum 100 characters)</div>
+                        </div>
+                        
+                        <!-- About Me for Counsellor -->
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">About Me</label>
+                            <textarea id="counsellor-about-me" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus transition-all h-32 resize-none" placeholder="Tell us about yourself, your interests, and what motivates you as a therapist..." required></textarea>
+                            <div class="text-xs text-slate-500 mt-1">This helps clients get to know you better</div>
+                            <div class="error-message" id="counsellor-about-me-error">Please tell us about yourself</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between mt-8">
+                        <button type="button" class="prev-step bg-slate-200 text-slate-700 px-6 py-3 rounded-lg font-medium btn-hover">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <button type="button" class="next-step bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium btn-hover">
+                            Continue <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 5: Counsellor Certifications -->
+                <div id="step-5-counsellor" class="form-section">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-6">Certifications</h3>
+                    
+                    <div class="space-y-5">
+                        <div class="bg-slate-50 rounded-lg p-4 mb-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-info-circle text-indigo-500 mt-1"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h4 class="text-sm font-medium text-slate-800">Certification Details</h4>
+                                    <p class="text-sm text-slate-600 mt-1">Add any additional certifications you hold. This helps with verification and builds client trust.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="certifications-container">
+                            <!-- Certification fields will be dynamically added here -->
+                        </div>
+                        
+                        <div class="flex justify-center">
+                            <button type="button" id="add-certification" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors inline-flex items-center">
+                                <i class="fas fa-plus mr-2"></i> Add Another Certification
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between mt-8">
+                        <button type="button" class="prev-step bg-slate-200 text-slate-700 px-6 py-3 rounded-lg font-medium btn-hover">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <button type="button" class="next-step bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium btn-hover">
+                            Continue <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 5: Client Terms & Finalization -->
+                <div id="step-5-client" class="form-section">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-6">Terms & Final Details</h3>
+                    
+                    <div class="bg-slate-50 rounded-lg p-4 mb-6">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle text-indigo-500 mt-1"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h4 class="text-sm font-medium text-slate-800">Almost there!</h4>
+                                <p class="text-sm text-slate-600 mt-1">Please review our terms and confirm your registration to complete your account setup.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4 mb-6">
+                        <div class="flex items-start">
+                            <input type="checkbox" id="client-terms" class="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded mt-0.5 checkbox-custom" required>
+                            <label for="client-terms" class="ml-3 block text-sm text-slate-700">
+                                I agree to the <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium">Terms of Service</a> and <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium">Privacy Policy</a>
+                            </label>
+                        </div>
+                        <div class="error-message" id="client-terms-error">Please accept the terms and conditions</div>
+                    </div>
+                    
+                    <div class="flex justify-between mt-8">
+                        <button type="button" class="prev-step bg-slate-200 text-slate-700 px-6 py-3 rounded-lg font-medium btn-hover">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <button type="submit" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium btn-hover">
+                            <i class="fas fa-user-plus mr-2"></i> Create Account
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 6: Counsellor Documents & Finalization -->
+                <div id="step-6-counsellor" class="form-section">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-6">Documents & Final Details</h3>
+                    
+                    <div class="space-y-5">
+                        <div class="bg-slate-50 rounded-lg p-4 mb-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-info-circle text-indigo-500 mt-1"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h4 class="text-sm font-medium text-slate-800">Verification Required</h4>
+                                    <p class="text-sm text-slate-600 mt-1">Please upload required documents for verification. Your account will be activated after verification.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">License Document</label>
+                                <div class="flex items-center justify-center w-full">
+                                    <label for="license-document" class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-lg cursor-pointer bg-slate-50 file-hover transition-colors">
+                                        <div class="flex flex-col items-center justify-center pt-5 pb-6" id="license-upload-content">
+                                            <i class="fas fa-cloud-upload-alt text-slate-400 text-2xl mb-2" id="license-upload-icon"></i>
+                                            <p class="mb-2 text-sm text-slate-500" id="license-file-text"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                                            <p class="text-xs text-slate-500" id="license-file-subtext">PDF, JPG, PNG (MAX. 20MB)</p>
+                                        </div>
+                                        <input id="license-document" type="file" class="hidden" accept=".pdf,.jpg,.jpeg,.png">
+                                    </label>
+                                </div>
+                                <div class="error-message" id="license-document-error">Please upload your license document</div>
+                                <div class="error-message" id="license-document-size-error" style="display: none;">File size exceeds the 20MB limit</div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Degree Certificate</label>
+                                <div class="flex items-center justify-center w-full">
+                                    <label for="degree-certificate" class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-lg cursor-pointer bg-slate-50 file-hover transition-colors">
+                                        <div class="flex flex-col items-center justify-center pt-5 pb-6" id="degree-upload-content">
+                                            <i class="fas fa-cloud-upload-alt text-slate-400 text-2xl mb-2" id="degree-upload-icon"></i>
+                                            <p class="mb-2 text-sm text-slate-500" id="degree-file-text"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                                            <p class="text-xs text-slate-500" id="degree-file-subtext">PDF, JPG, PNG (MAX. 20MB)</p>
+                                        </div>
+                                        <input id="degree-certificate" type="file" class="hidden" accept=".pdf,.jpg,.jpeg,.png">
+                                    </label>
+                                </div>
+                                <div class="error-message" id="degree-certificate-error">Please upload your degree certificate</div>
+                                <div class="error-message" id="degree-certificate-size-error" style="display: none;">File size exceeds the 20MB limit</div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">ID Proof</label>
+                            <div class="flex items-center justify-center w-full">
+                                <label for="id-proof" class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-lg cursor-pointer bg-slate-50 file-hover transition-colors">
+                                    <div class="flex flex-col items-center justify-center pt-5 pb-6" id="id-upload-content">
+                                        <i class="fas fa-cloud-upload-alt text-slate-400 text-2xl mb-2" id="id-upload-icon"></i>
+                                        <p class="mb-2 text-sm text-slate-500" id="id-file-text"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                                        <p class="text-xs text-slate-500" id="id-file-subtext">PDF, JPG, PNG (MAX. 20MB)</p>
+                                    </div>
+                                    <input id="id-proof" type="file" class="hidden" accept=".pdf,.jpg,.jpeg,.png">
+                                </label>
+                            </div>
+                            <div class="error-message" id="id-proof-error">Please upload your ID proof</div>
+                            <div class="error-message" id="id-proof-size-error" style="display: none;">File size exceeds the 20MB limit</div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <input type="checkbox" id="counsellor-terms" class="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded mt-0.5 checkbox-custom" required>
+                                <label for="counsellor-terms" class="ml-3 block text-sm text-slate-700">
+                                    I agree to the <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium">Terms of Service</a> and <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium">Privacy Policy</a>
+                                </label>
+                            </div>
+                            <div class="flex items-start">
+                                <input type="checkbox" id="consent" class="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded mt-0.5 checkbox-custom" required>
+                                <label for="consent" class="ml-3 block text-sm text-slate-700">
+                                    I consent to background verification and understand my account will be activated only after verification
+                                </label>
+                            </div>
+                            <div class="error-message" id="counsellor-terms-error">Please accept all terms and conditions</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between mt-8">
+                        <button type="button" class="prev-step bg-slate-200 text-slate-700 px-6 py-3 rounded-lg font-medium btn-hover">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <button type="submit" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium btn-hover">
+                            <i class="fas fa-user-plus mr-2"></i> Complete Registration
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mt-8 text-center border-t border-slate-200 pt-6">
+                    <p class="text-slate-600">Already have an account? <a href="/accounts/login/" class="text-indigo-600 font-medium hover:text-indigo-500">Sign in here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client Success Modal -->
+    <div id="client-success-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 animate-slide-up">
+            <div class="flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mx-auto mb-4">
+                <i class="fas fa-envelope text-green-600 text-2xl"></i>
+            </div>
+            
+            <h3 class="text-xl font-bold text-slate-800 text-center mb-2">Verify Your Email</h3>
+            <p class="text-slate-600 text-center mb-6">We've sent a verification link to your email address. Please check your inbox and click the link to verify your account and complete your registration.</p>
+            
+            <div class="flex space-x-4">
+                <button id="client-verify-btn" class="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors">
+                    Go to Email Verification
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Counsellor Success Modal -->
+    <div id="counsellor-success-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 animate-slide-up">
+            <div class="flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4">
+                <i class="fas fa-user-check text-blue-600 text-2xl"></i>
+            </div>
+            
+            <h3 class="text-xl font-bold text-slate-800 text-center mb-2">Registration Under Review</h3>
+            <p class="text-slate-600 text-center mb-6">Thank you for registering as a counsellor! We've sent a verification link to your email. Please verify your email to complete the registration process. Your background verification is in process and you will be notified once your account is activated.</p>
+            
+            <div class="flex space-x-4">
+                <button id="counsellor-verify-btn" class="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors">
+                    Go to Email Verification
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Loader -->
+    <div id="form-loader" class="form-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <div class="loader-text">Creating your account...</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize variables
+            let currentStep = 1;
+            let selectedRole = '';
+            const totalSteps = {
+                client: 5,
+                counsellor: 6
+            };
+            
+            // Set file size limits (20MB)
+            const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB in bytes
+            const MAX_CERTIFICATION_FILE_SIZE = 20 * 1024 * 1024; // 20MB in bytes
+            
+            // DOM Elements
+            const roleCards = document.querySelectorAll('.role-card');
+            const clientProgress = document.getElementById('client-progress');
+            const counsellorProgress = document.getElementById('counsellor-progress');
+            const formSections = document.querySelectorAll('.form-section');
+            
+            // Modal Elements
+            const clientSuccessModal = document.getElementById('client-success-modal');
+            const counsellorSuccessModal = document.getElementById('counsellor-success-modal');
+            const clientVerifyBtn = document.getElementById('client-verify-btn');
+            const counsellorVerifyBtn = document.getElementById('counsellor-verify-btn');
+            
+            // Loader Element
+            const formLoader = document.getElementById('form-loader');
+            
+            // Profile Picture Elements
+            const profilePictureInput = document.getElementById('profile-picture');
+            const profilePicturePreview = document.getElementById('profile-picture-preview');
+            const profileUploadBtn = document.getElementById('profile-upload-btn');
+            
+            // License Type Elements
+            const licenseTypeSelect = document.getElementById('license-type');
+            const otherLicenseTypeContainer = document.getElementById('other-license-type-container');
+            const otherLicenseTypeInput = document.getElementById('other-license-type');
+            
+            // Primary Concern Elements (Client)
+            const primaryConcernSelect = document.getElementById('client-primary-concern');
+            const otherPrimaryConcernContainer = document.getElementById('other-primary-concern-container');
+            const otherPrimaryConcernInput = document.getElementById('other-primary-concern');
+            
+            // Certifications Elements
+            const certificationsContainer = document.getElementById('certifications-container');
+            const addCertificationBtn = document.getElementById('add-certification');
+            
+            // File upload functionality
+            const licenseFileInput = document.getElementById('license-document');
+            const degreeFileInput = document.getElementById('degree-certificate');
+            const idFileInput = document.getElementById('id-proof');
+            
+            // CSRF Token Setup
+            const csrfTokenInput = document.getElementById('csrf-token');
+            
+            // =============================================
+            // REAL-TIME VALIDATION SETUP FOR ALL FIELDS
+            // =============================================
+            
+            // Initialize real-time validation for all fields
+            function initializeRealTimeValidation() {
+                // Step 1: Role Selection
+                roleCards.forEach(card => {
+                    card.addEventListener('click', function() {
+                        hideError('role-error');
+                    });
+                });
+                
+                // Step 2: Basic Information Fields
+                setupFieldValidation('first-name', validateFirstName);
+                setupFieldValidation('last-name', validateLastName);
+                setupFieldValidation('email', validateEmail);
+                setupFieldValidation('phone', validatePhone);
+                setupFieldValidation('password', validatePassword);
+                setupFieldValidation('confirm-password', validateConfirmPassword);
+                
+                // Gender select field
+                const genderSelect = document.getElementById('gender');
+                if (genderSelect) {
+                    genderSelect.addEventListener('change', function() {
+                        validateGender();
+                    });
+                    genderSelect.addEventListener('blur', function() {
+                        validateGender();
+                    });
+                }
+                
+                // Step 3 Client: Additional Information
+                setupFieldValidation('date-of-birth', validateDateOfBirth);
+                
+                // Primary Concern select field
+                if (primaryConcernSelect) {
+                    primaryConcernSelect.addEventListener('change', function() {
+                        validatePrimaryConcern();
+                        // Show/hide other concern field
+                        if (this.value === 'other') {
+                            otherPrimaryConcernContainer.classList.remove('hidden');
+                            setupFieldValidation('other-primary-concern', validateOtherPrimaryConcern);
+                        } else {
+                            otherPrimaryConcernContainer.classList.add('hidden');
+                            hideError('other-primary-concern-error');
+                        }
+                    });
+                    primaryConcernSelect.addEventListener('blur', function() {
+                        validatePrimaryConcern();
+                    });
+                }
+                
+                // Other Primary Concern field
+                if (otherPrimaryConcernInput) {
+                    setupFieldValidation('other-primary-concern', validateOtherPrimaryConcern);
+                }
+                
+                // Step 4 Client: About Me
+                setupTextAreaValidation('client-about-me', validateClientAboutMe);
+                
+                // Step 3 Counsellor: Professional Information
+                setupFieldValidation('license-number', validateLicenseNumber);
+                setupFieldValidation('license-authority', validateLicenseAuthority);
+                setupFieldValidation('license-expiry', validateLicenseExpiry);
+                setupFieldValidation('years-experience', validateYearsExperience);
+                setupFieldValidation('university', validateUniversity);
+                setupFieldValidation('graduation-year', validateGraduationYear);
+                
+                // License Type select field
+                if (licenseTypeSelect) {
+                    licenseTypeSelect.addEventListener('change', function() {
+                        validateLicenseType();
+                        // Show/hide other license type field
+                        if (this.value === 'other') {
+                            otherLicenseTypeContainer.classList.remove('hidden');
+                            setupFieldValidation('other-license-type', validateOtherLicenseType);
+                        } else {
+                            otherLicenseTypeContainer.classList.add('hidden');
+                            hideError('other-license-type-error');
+                        }
+                    });
+                    licenseTypeSelect.addEventListener('blur', function() {
+                        validateLicenseType();
+                    });
+                }
+                
+                // Other License Type field
+                if (otherLicenseTypeInput) {
+                    setupFieldValidation('other-license-type', validateOtherLicenseType);
+                }
+                
+                // Highest Degree select field
+                const highestDegreeSelect = document.getElementById('highest-degree');
+                if (highestDegreeSelect) {
+                    highestDegreeSelect.addEventListener('change', function() {
+                        validateHighestDegree();
+                    });
+                    highestDegreeSelect.addEventListener('blur', function() {
+                        validateHighestDegree();
+                    });
+                }
+                
+                // Specializations checkboxes
+                const specializationCheckboxes = document.querySelectorAll('.specialization-checkbox');
+                specializationCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        validateSpecializations();
+                    });
+                });
+                
+                // Therapy Approaches checkboxes
+                const approachCheckboxes = document.querySelectorAll('.therapy-approach-checkbox');
+                approachCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        validateApproaches();
+                    });
+                });
+                
+                // Step 4 Counsellor: Practice Details
+                setupFieldValidation('session-fee', validateSessionFee);
+                setupFieldValidation('google-meet-link', validateGoogleMeetLink);
+                setupTextAreaValidation('professional-experience', validateProfessionalExperience);
+                setupTextAreaValidation('counsellor-about-me', validateCounsellorAboutMe);
+                
+                // Languages checkboxes
+                const languageCheckboxes = document.querySelectorAll('input[type="checkbox"][id^="lang-"]');
+                languageCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        validateLanguages();
+                    });
+                });
+                
+                // Age Groups checkboxes
+                const ageGroupCheckboxes = document.querySelectorAll('input[type="checkbox"][id^="age-"]');
+                ageGroupCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        validateAgeGroups();
+                    });
+                });
+                
+                // Step 5 Client & Step 6 Counsellor: Terms
+                const clientTerms = document.getElementById('client-terms');
+                const counsellorTerms = document.getElementById('counsellor-terms');
+                const consentCheckbox = document.getElementById('consent');
+                
+                if (clientTerms) {
+                    clientTerms.addEventListener('change', function() {
+                        validateClientTerms();
+                    });
+                }
+                
+                if (counsellorTerms) {
+                    counsellorTerms.addEventListener('change', function() {
+                        validateCounsellorTerms();
+                    });
+                }
+                
+                if (consentCheckbox) {
+                    consentCheckbox.addEventListener('change', function() {
+                        validateCounsellorTerms();
+                    });
+                }
+                
+                // Document upload real-time validation
+                setupDocumentUploadValidation('license-document', 'license-document-error', 'license-document-size-error');
+                setupDocumentUploadValidation('degree-certificate', 'degree-certificate-error', 'degree-certificate-size-error');
+                setupDocumentUploadValidation('id-proof', 'id-proof-error', 'id-proof-size-error');
+            }
+            
+            // Setup document upload validation
+            function setupDocumentUploadValidation(fileInputId, errorId, sizeErrorId) {
+                const fileInput = document.getElementById(fileInputId);
+                if (fileInput) {
+                    fileInput.addEventListener('change', function() {
+                        validateDocumentUpload(this, errorId, sizeErrorId);
+                    });
+                }
+            }
+            
+            // Validate document upload
+            function validateDocumentUpload(fileInput, errorId, sizeErrorId) {
+                if (fileInput.files.length > 0) {
+                    hideError(errorId);
+                    // Check file size
+                    if (fileInput.files[0].size > MAX_FILE_SIZE) {
+                        showError(sizeErrorId, 'File size exceeds the 20MB limit');
+                    } else {
+                        hideError(sizeErrorId);
+                    }
+                } else {
+                    // No file selected
+                    showError(errorId, 'Please upload the required document');
+                    hideError(sizeErrorId);
+                }
+            }
+            
+            // Generic function to setup validation for input fields
+            function setupFieldValidation(fieldId, validationFunction) {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('input', function() {
+                        validationFunction();
+                    });
+                    field.addEventListener('blur', function() {
+                        validationFunction();
+                    });
+                }
+            }
+            
+            // Generic function to setup validation for textarea fields
+            function setupTextAreaValidation(fieldId, validationFunction) {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('input', function() {
+                        validationFunction();
+                    });
+                    field.addEventListener('blur', function() {
+                        validationFunction();
+                    });
+                }
+            }
+            
+            // =============================================
+            // INDIVIDUAL VALIDATION FUNCTIONS
+            // =============================================
+            
+            // Step 1: Role Selection
+            function validateRole() {
+                if (!selectedRole) {
+                    showError('role-error', 'Please select your role');
+                    return false;
+                } else {
+                    hideError('role-error');
+                    return true;
+                }
+            }
+            
+            // Step 2: Basic Information
+            function validateFirstName() {
+                const firstName = document.getElementById('first-name');
+                if (!firstName.value.trim()) {
+                    showError('first-name-error', 'Please enter your first name');
+                    firstName.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('first-name-error');
+                    firstName.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            function validateLastName() {
+                const lastName = document.getElementById('last-name');
+                if (!lastName.value.trim()) {
+                    showError('last-name-error', 'Please enter your last name');
+                    lastName.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('last-name-error');
+                    lastName.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            function validateGender() {
+                const gender = document.getElementById('gender');
+                if (!gender.value) {
+                    showError('gender-error', 'Please select your gender');
+                    gender.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('gender-error');
+                    gender.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            function validateEmail() {
+                const email = document.getElementById('email');
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!email.value.trim() || !emailRegex.test(email.value)) {
+                    showError('email-error', 'Please enter a valid email address');
+                    email.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('email-error');
+                    email.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            function validatePhone() {
+                const phone = document.getElementById('phone');
+                const phoneRegex = /^\d{10}$/;
+                const phoneValue = phone.value.replace(/\D/g, '');
+                if (!phoneValue || !phoneRegex.test(phoneValue)) {
+                    showError('phone-error', 'Please enter a valid 10-digit phone number');
+                    phone.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('phone-error');
+                    phone.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            function validatePassword() {
+                const password = document.getElementById('password');
+                if (!password.value || password.value.length < 8) {
+                    showError('password-error', 'Password must be at least 8 characters');
+                    password.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('password-error');
+                    password.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            function validateConfirmPassword() {
+                const password = document.getElementById('password');
+                const confirmPassword = document.getElementById('confirm-password');
+                if (password.value !== confirmPassword.value) {
+                    showError('confirm-password-error', 'Passwords do not match');
+                    confirmPassword.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('confirm-password-error');
+                    confirmPassword.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            // Step 3 Client: Additional Information
+            function validateDateOfBirth() {
+                const dateOfBirth = document.getElementById('date-of-birth');
+                if (!dateOfBirth.value) {
+                    showError('date-of-birth-error', 'Please enter your date of birth');
+                    dateOfBirth.classList.add('input-error');
+                    return false;
+                } else {
+                    const birthDate = new Date(dateOfBirth.value);
+                    const today = new Date();
+                    let age = today.getFullYear() - birthDate.getFullYear();
+                    const monthDiff = today.getMonth() - birthDate.getMonth();
+                    
+                    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                        age--;
+                    }
+                    
+                    if (age < 18) {
+                        showError('date-of-birth-error', 'You must be at least 18 years old to register');
+                        dateOfBirth.classList.add('input-error');
+                        return false;
+                    } else if (age > 120) {
+                        showError('date-of-birth-error', 'Please enter a valid date of birth');
+                        dateOfBirth.classList.add('input-error');
+                        return false;
+                    } else {
+                        hideError('date-of-birth-error');
+                        dateOfBirth.classList.remove('input-error');
+                        return true;
+                    }
+                }
+            }
+            
+            function validatePrimaryConcern() {
+                const primaryConcern = document.getElementById('client-primary-concern');
+                if (!primaryConcern.value) {
+                    showError('client-primary-concern-error', 'Please select your primary concern');
+                    primaryConcern.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('client-primary-concern-error');
+                    primaryConcern.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            function validateOtherPrimaryConcern() {
+                const primaryConcern = document.getElementById('client-primary-concern');
+                const otherConcern = document.getElementById('other-primary-concern');
+                if (primaryConcern.value === 'other' && !otherConcern.value.trim()) {
+                    showError('other-primary-concern-error', 'Please specify your primary concern');
+                    otherConcern.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('other-primary-concern-error');
+                    otherConcern.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            // Step 4 Client: About Me
+            function validateClientAboutMe() {
+                const aboutMe = document.getElementById('client-about-me');
+                if (!aboutMe.value.trim()) {
+                    showError('client-about-me-error', 'Please tell us a bit about yourself');
+                    aboutMe.classList.add('input-error');
+                    return false;
+                } else if (aboutMe.value.trim().length < 10) {
+                    showError('client-about-me-error', 'About me should be at least 10 characters long');
+                    aboutMe.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('client-about-me-error');
+                    aboutMe.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            // Step 3 Counsellor: Professional Information
+            function validateLicenseNumber() {
+                const licenseNumber = document.getElementById('license-number');
+                if (!licenseNumber.value.trim()) {
+                    showError('license-number-error', 'Please enter your license number');
+                    licenseNumber.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('license-number-error');
+                    licenseNumber.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            function validateLicenseType() {
+                const licenseType = document.getElementById('license-type');
+                if (!licenseType.value) {
+                    showError('license-type-error', 'Please select your license type');
+                    licenseType.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('license-type-error');
+                    licenseType.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            function validateOtherLicenseType() {
+                const licenseType = document.getElementById('license-type');
+                const otherLicenseType = document.getElementById('other-license-type');
+                if (licenseType.value === 'other' && !otherLicenseType.value.trim()) {
+                    showError('other-license-type-error', 'Please specify your license type');
+                    otherLicenseType.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('other-license-type-error');
+                    otherLicenseType.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            function validateLicenseAuthority() {
+                const licenseAuthority = document.getElementById('license-authority');
+                if (!licenseAuthority.value.trim()) {
+                    showError('license-authority-error', 'Please enter license issuing authority');
+                    licenseAuthority.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('license-authority-error');
+                    licenseAuthority.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            function validateLicenseExpiry() {
+                const licenseExpiry = document.getElementById('license-expiry');
+                if (!licenseExpiry.value) {
+                    showError('license-expiry-error', 'Please select license expiry date');
+                    licenseExpiry.classList.add('input-error');
+                    return false;
+                } else {
+                    const expiryDate = new Date(licenseExpiry.value);
+                    const today = new Date();
+                    if (expiryDate <= today) {
+                        showError('license-expiry-error', 'License expiry date must be in the future');
+                        licenseExpiry.classList.add('input-error');
+                        return false;
+                    } else {
+                        hideError('license-expiry-error');
+                        licenseExpiry.classList.remove('input-error');
+                        return true;
+                    }
+                }
+            }
+            
+            function validateSpecializations() {
+                const specializations = document.querySelectorAll('.specialization-checkbox:checked');
+                if (specializations.length === 0) {
+                    showError('specializations-error', 'Please select at least one specialization');
+                    return false;
+                } else {
+                    hideError('specializations-error');
+                    return true;
+                }
+            }
+            
+            function validateApproaches() {
+                const approaches = document.querySelectorAll('.therapy-approach-checkbox:checked');
+                if (approaches.length === 0) {
+                    showError('approaches-error', 'Please select at least one therapy approach');
+                    return false;
+                } else {
+                    hideError('approaches-error');
+                    return true;
+                }
+            }
+            
+            function validateYearsExperience() {
+                const yearsExperience = document.getElementById('years-experience');
+                if (!yearsExperience.value || yearsExperience.value < 1) {
+                    showError('years-experience-error', 'Please enter years of experience (minimum 1 year)');
+                    yearsExperience.classList.add('input-error');
+                    return false;
+                } else if (yearsExperience.value > 50) {
+                    showError('years-experience-error', 'Years of experience cannot exceed 50');
+                    yearsExperience.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('years-experience-error');
+                    yearsExperience.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            function validateHighestDegree() {
+                const highestDegree = document.getElementById('highest-degree');
+                if (!highestDegree.value) {
+                    showError('highest-degree-error', 'Please select your highest degree');
+                    highestDegree.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('highest-degree-error');
+                    highestDegree.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            function validateUniversity() {
+                const university = document.getElementById('university');
+                if (!university.value.trim()) {
+                    showError('university-error', 'Please enter your university/institution');
+                    university.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('university-error');
+                    university.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            function validateGraduationYear() {
+                const graduationYear = document.getElementById('graduation-year');
+                if (!graduationYear.value || graduationYear.value < 1950 || graduationYear.value > 2024) {
+                    showError('graduation-year-error', 'Please enter a valid graduation year (1950-2024)');
+                    graduationYear.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('graduation-year-error');
+                    graduationYear.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            // Step 4 Counsellor: Practice Details
+            function validateSessionFee() {
+                const sessionFee = document.getElementById('session-fee');
+                if (!sessionFee.value || sessionFee.value < 0) {
+                    showError('session-fee-error', 'Please enter a valid session fee');
+                    sessionFee.classList.add('input-error');
+                    return false;
+                } else if (sessionFee.value > 10000) {
+                    showError('session-fee-error', 'Session fee cannot exceed ₹10,000');
+                    sessionFee.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('session-fee-error');
+                    sessionFee.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            function validateLanguages() {
+                const languages = document.querySelectorAll('input[type="checkbox"][id^="lang-"]:checked');
+                if (languages.length === 0) {
+                    showError('languages-error', 'Please select at least one language');
+                    return false;
+                } else {
+                    hideError('languages-error');
+                    return true;
+                }
+            }
+            
+            function validateGoogleMeetLink() {
+                const googleMeetLink = document.getElementById('google-meet-link');
+                const urlRegex = /^(https?:\/\/)?(meet\.google\.com\/[a-zA-Z0-9-_]+)(\?.*)?$/;
+                if (!googleMeetLink.value.trim() || !urlRegex.test(googleMeetLink.value)) {
+                    showError('google-meet-link-error', 'Please enter a valid Google Meet URL (e.g., https://meet.google.com/mvp-smes-vuj)');
+                    googleMeetLink.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('google-meet-link-error');
+                    googleMeetLink.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            function validateAgeGroups() {
+                const ageGroups = document.querySelectorAll('input[type="checkbox"][id^="age-"]:checked');
+                if (ageGroups.length === 0) {
+                    showError('age-groups-error', 'Please select at least one age group');
+                    return false;
+                } else {
+                    hideError('age-groups-error');
+                    return true;
+                }
+            }
+            
+            function validateProfessionalExperience() {
+                const professionalExperience = document.getElementById('professional-experience');
+                if (!professionalExperience.value.trim()) {
+                    showError('professional-experience-error', 'Please enter your professional experience');
+                    professionalExperience.classList.add('input-error');
+                    return false;
+                } else if (professionalExperience.value.trim().length < 100) {
+                    showError('professional-experience-error', 'Professional experience must be at least 100 characters');
+                    professionalExperience.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('professional-experience-error');
+                    professionalExperience.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            function validateCounsellorAboutMe() {
+                const counsellorAboutMe = document.getElementById('counsellor-about-me');
+                if (!counsellorAboutMe.value.trim()) {
+                    showError('counsellor-about-me-error', 'Please tell us about yourself');
+                    counsellorAboutMe.classList.add('input-error');
+                    return false;
+                } else if (counsellorAboutMe.value.trim().length < 10) {
+                    showError('counsellor-about-me-error', 'About me should be at least 10 characters long');
+                    counsellorAboutMe.classList.add('input-error');
+                    return false;
+                } else {
+                    hideError('counsellor-about-me-error');
+                    counsellorAboutMe.classList.remove('input-error');
+                    return true;
+                }
+            }
+            
+            // Terms validation
+            function validateClientTerms() {
+                const termsCheckbox = document.getElementById('client-terms');
+                if (!termsCheckbox.checked) {
+                    showError('client-terms-error', 'Please accept the terms and conditions');
+                    return false;
+                } else {
+                    hideError('client-terms-error');
+                    return true;
+                }
+            }
+            
+            function validateCounsellorTerms() {
+                const termsCheckbox = document.getElementById('counsellor-terms');
+                const consentCheckbox = document.getElementById('consent');
+                if (!termsCheckbox.checked || !consentCheckbox.checked) {
+                    showError('counsellor-terms-error', 'Please accept all terms and conditions');
+                    return false;
+                } else {
+                    hideError('counsellor-terms-error');
+                    return true;
+                }
+            }
+            
+            // Show error message
+            function showError(elementId, message) {
+                const errorElement = document.getElementById(elementId);
+                if (errorElement) {
+                    errorElement.textContent = message;
+                    errorElement.style.display = 'block';
+                }
+            }
+            
+            // Hide error message
+            function hideError(elementId) {
+                const errorElement = document.getElementById(elementId);
+                if (errorElement) {
+                    errorElement.style.display = 'none';
+                }
+            }
+            
+            // =============================================
+            // EXISTING FUNCTIONALITY
+            // =============================================
+            
+            // Function to get CSRF token from cookies
+            function getCSRFToken() {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, 'csrftoken'.length + 1) === ('csrftoken' + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring('csrftoken'.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            
+            // Set CSRF token in hidden field
+            csrfTokenInput.value = getCSRFToken();
+            
+            // Initialize real-time validation
+            initializeRealTimeValidation();
+            
+            // Setup file upload handlers
+            setupFileUpload(licenseFileInput, 'license');
+            setupFileUpload(degreeFileInput, 'degree');
+            setupFileUpload(idFileInput, 'id');
+            
+
+            
+            // Close modals when clicking outside - PREVENT THIS
+            clientSuccessModal.addEventListener('click', function(e) {
+                if (e.target === clientSuccessModal) {
+                    return false; // Prevent closing
+                }
+            });
+            
+            counsellorSuccessModal.addEventListener('click', function(e) {
+                if (e.target === counsellorSuccessModal) {
+                    return false; // Prevent closing
+                }
+            });
+            
+            // Close modals with Escape key - PREVENT THIS
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    return false; // Prevent closing
+                }
+            });
+
+            
+            // Modal Button Event Listeners
+            clientVerifyBtn.addEventListener('click', function() {
+                window.location.href = '/accounts/email_verify/';
+            });
+            
+            counsellorVerifyBtn.addEventListener('click', function() {
+                window.location.href = '/accounts/email_verify/';
+            });
+            
+            // Profile Picture Upload
+            profileUploadBtn.addEventListener('click', function() {
+                profilePictureInput.click();
+            });
+            
+            profilePictureInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        profilePicturePreview.innerHTML = `<img src="${e.target.result}" alt="Profile Picture">`;
+                    }
+                    
+                    reader.readAsDataURL(this.files[0]);
+                    hideError('profile-picture-error');
+                }
+            });
+            
+            // License Type Change Handler
+            licenseTypeSelect.addEventListener('change', function() {
+                if (this.value === 'other') {
+                    otherLicenseTypeContainer.classList.remove('hidden');
+                } else {
+                    otherLicenseTypeContainer.classList.add('hidden');
+                    hideError('other-license-type-error');
+                }
+            });
+            
+            // Primary Concern Change Handler (Client)
+            primaryConcernSelect.addEventListener('change', function() {
+                if (this.value === 'other') {
+                    otherPrimaryConcernContainer.classList.remove('hidden');
+                } else {
+                    otherPrimaryConcernContainer.classList.add('hidden');
+                    hideError('other-primary-concern-error');
+                }
+            });
+            
+            // Add Certification Functionality
+            addCertificationBtn.addEventListener('click', function() {
+                addCertificationField();
+            });
+            
+            // Role Selection
+            roleCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // Remove selection from all cards
+                    roleCards.forEach(c => {
+                        c.classList.remove('selected');
+                        c.querySelector('div:last-child').classList.add('hidden');
+                    });
+                    
+                    // Add selection to clicked card
+                    this.classList.add('selected');
+                    this.querySelector('div:last-child').classList.remove('hidden');
+                    
+                    // Store selected role
+                    selectedRole = this.getAttribute('data-role');
+                    
+                    // Show appropriate progress bar
+                    if (selectedRole === 'client') {
+                        clientProgress.classList.remove('hidden');
+                        counsellorProgress.classList.add('hidden');
+                    } else if (selectedRole === 'counsellor') {
+                        counsellorProgress.classList.remove('hidden');
+                        clientProgress.classList.add('hidden');
+                    }
+                });
+            });
+            
+            // Next Step Button
+            document.querySelectorAll('.next-step').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (validateStep(currentStep)) {
+                        if (currentStep < getTotalSteps()) {
+                            navigateToStep(currentStep + 1);
+                        }
+                    }
+                });
+            });
+            
+            // Previous Step Button
+            document.querySelectorAll('.prev-step').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (currentStep > 1) {
+                        navigateToStep(currentStep - 1);
+                    }
+                });
+            });
+            
+            // Get total steps based on role
+            function getTotalSteps() {
+                return selectedRole ? totalSteps[selectedRole] : 5;
+            }
+            
+            // Navigate to specific step
+            function navigateToStep(step) {
+                // Update current step
+                currentStep = step;
+                
+                // Update progress bar
+                updateProgressBar();
+                
+                // Hide all form sections
+                formSections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Show current form section based on role and step
+                const currentSection = getCurrentSection(step);
+                if (currentSection) {
+                    currentSection.classList.add('active');
+                }
+            }
+            
+            // Get current section based on step and role
+            function getCurrentSection(step) {
+                if (!selectedRole) return document.getElementById(`step-${step}`);
+                
+                if (selectedRole === 'client') {
+                    if (step === 3) return document.getElementById('step-3-client');
+                    if (step === 4) return document.getElementById('step-4-client');
+                    if (step === 5) return document.getElementById('step-5-client');
+                } else if (selectedRole === 'counsellor') {
+                    if (step === 3) return document.getElementById('step-3-counsellor');
+                    if (step === 4) return document.getElementById('step-4-counsellor');
+                    if (step === 5) return document.getElementById('step-5-counsellor');
+                    if (step === 6) return document.getElementById('step-6-counsellor');
+                }
+                
+                return document.getElementById(`step-${step}`);
+            }
+            
+            // Update progress bar
+            function updateProgressBar() {
+                const progressBar = selectedRole === 'client' ? clientProgress : counsellorProgress;
+                
+                if (progressBar) {
+                    // Update step indicators
+                    const stepItems = progressBar.querySelectorAll('.step-item');
+                    stepItems.forEach((item, index) => {
+                        const stepNumber = parseInt(item.getAttribute('data-step'));
+                        const stepIndicator = item.querySelector('.step-indicator');
+                        
+                        // Remove all classes
+                        stepIndicator.classList.remove('active', 'completed');
+                        
+                        // Add appropriate classes
+                        if (stepNumber < currentStep) {
+                            stepIndicator.classList.add('completed');
+                        } else if (stepNumber === currentStep) {
+                            stepIndicator.classList.add('active');
+                        }
+                    });
+                }
+            }
+            
+            // COMPLETE FORM VALIDATION FUNCTION
+            function validateStep(step) {
+                let isValid = true;
+                
+                if (step === 1) {
+                    // Role selection validation
+                    if (!validateRole()) {
+                        isValid = false;
+                    }
+                }
+                
+                if (step === 2) {
+                    // Profile Picture
+                    const profilePicture = document.getElementById('profile-picture');
+                    if (!profilePicture.files.length) {
+                        showError('profile-picture-error', 'Please upload a profile picture');
+                        isValid = false;
+                    } else {
+                        hideError('profile-picture-error');
+                    }
+                    
+                    // First Name
+                    if (!validateFirstName()) {
+                        isValid = false;
+                    }
+                    
+                    // Last Name
+                    if (!validateLastName()) {
+                        isValid = false;
+                    }
+                    
+                    // Gender
+                    if (!validateGender()) {
+                        isValid = false;
+                    }
+                    
+                    // Email
+                    if (!validateEmail()) {
+                        isValid = false;
+                    }
+                    
+                    // Phone
+                    if (!validatePhone()) {
+                        isValid = false;
+                    }
+                    
+                    // Password
+                    if (!validatePassword()) {
+                        isValid = false;
+                    }
+                    
+                    // Confirm Password
+                    if (!validateConfirmPassword()) {
+                        isValid = false;
+                    }
+                }
+                
+                if (step === 3 && selectedRole === 'client') {
+                    // Date of Birth
+                    if (!validateDateOfBirth()) {
+                        isValid = false;
+                    }
+                    
+                    // Client Primary Concern
+                    if (!validatePrimaryConcern()) {
+                        isValid = false;
+                    }
+                    
+                    // Other Primary Concern (if applicable)
+                    if (primaryConcernSelect.value === 'other' && !validateOtherPrimaryConcern()) {
+                        isValid = false;
+                    }
+                }
+                
+                if (step === 4 && selectedRole === 'client') {
+                    // About Me
+                    if (!validateClientAboutMe()) {
+                        isValid = false;
+                    }
+                }
+                
+                if (step === 3 && selectedRole === 'counsellor') {
+                    // License Number
+                    if (!validateLicenseNumber()) {
+                        isValid = false;
+                    }
+                    
+                    // License Type
+                    if (!validateLicenseType()) {
+                        isValid = false;
+                    }
+                    
+                    // Other License Type (if applicable)
+                    if (licenseTypeSelect.value === 'other' && !validateOtherLicenseType()) {
+                        isValid = false;
+                    }
+                    
+                    // License Authority
+                    if (!validateLicenseAuthority()) {
+                        isValid = false;
+                    }
+                    
+                    // License Expiry
+                    if (!validateLicenseExpiry()) {
+                        isValid = false;
+                    }
+                    
+                    // Specializations
+                    if (!validateSpecializations()) {
+                        isValid = false;
+                    }
+                    
+                    // Therapy Approaches
+                    if (!validateApproaches()) {
+                        isValid = false;
+                    }
+                    
+                    // Years of Experience
+                    if (!validateYearsExperience()) {
+                        isValid = false;
+                    }
+                    
+                    // Highest Degree
+                    if (!validateHighestDegree()) {
+                        isValid = false;
+                    }
+                    
+                    // University
+                    if (!validateUniversity()) {
+                        isValid = false;
+                    }
+                    
+                    // Graduation Year
+                    if (!validateGraduationYear()) {
+                        isValid = false;
+                    }
+                }
+                
+                if (step === 4 && selectedRole === 'counsellor') {
+                    // Session Fee
+                    if (!validateSessionFee()) {
+                        isValid = false;
+                    }
+                    
+                    // Languages
+                    if (!validateLanguages()) {
+                        isValid = false;
+                    }
+                    
+                    // Google Meet Link
+                    if (!validateGoogleMeetLink()) {
+                        isValid = false;
+                    }
+                    
+                    // Age Groups
+                    if (!validateAgeGroups()) {
+                        isValid = false;
+                    }
+                    
+                    // Professional Experience
+                    if (!validateProfessionalExperience()) {
+                        isValid = false;
+                    }
+                    
+                    // About Me for Counsellor
+                    if (!validateCounsellorAboutMe()) {
+                        isValid = false;
+                    }
+                }
+                
+                if (step === 5 && selectedRole === 'counsellor') {
+                    // Certification validation - only validate individual fields
+                    const certificationFields = certificationsContainer.querySelectorAll('.certification-field');
+                    
+                    if (certificationFields.length === 0) {
+                        // No certification fields added
+                        isValid = false;
+                    } else {
+                        let hasAtLeastOneValidCertification = false;
+                        
+                        // Validate each certification field
+                        certificationFields.forEach((field, index) => {
+                            const certName = field.querySelector('input[name="certification-name[]"]');
+                            const certOrg = field.querySelector('input[name="certification-organization[]"]');
+                            const certYear = field.querySelector('input[name="certification-year[]"]');
+                            const certFile = field.querySelector('input[type="file"]');
+                            
+                            // Check if all fields are filled
+                            const isNameFilled = certName.value.trim() !== '';
+                            const isOrgFilled = certOrg.value.trim() !== '';
+                            const isYearFilled = certYear.value.trim() !== '';
+                            const isFileUploaded = certFile.files.length > 0;
+                            
+                            // If any field is filled, all must be filled
+                            if (isNameFilled || isOrgFilled || isYearFilled || isFileUploaded) {
+                                if (!isNameFilled) {
+                                    showError(`cert-name-error-${index}`, 'Please enter certification name');
+                                    certName.classList.add('input-error');
+                                    isValid = false;
+                                } else {
+                                    hideError(`cert-name-error-${index}`);
+                                    certName.classList.remove('input-error');
+                                }
+                                
+                                if (!isOrgFilled) {
+                                    showError(`cert-org-error-${index}`, 'Please enter issuing organization');
+                                    certOrg.classList.add('input-error');
+                                    isValid = false;
+                                } else {
+                                    hideError(`cert-org-error-${index}`);
+                                    certOrg.classList.remove('input-error');
+                                }
+                                
+                                if (!isYearFilled) {
+                                    showError(`cert-year-error-${index}`, 'Please enter year obtained');
+                                    certYear.classList.add('input-error');
+                                    isValid = false;
+                                } else if (certYear.value && (certYear.value < 1950 || certYear.value > new Date().getFullYear())) {
+                                    showError(`cert-year-error-${index}`, 'Please enter a valid year');
+                                    certYear.classList.add('input-error');
+                                    isValid = false;
+                                } else {
+                                    hideError(`cert-year-error-${index}`);
+                                    certYear.classList.remove('input-error');
+                                }
+                                
+                                if (!isFileUploaded) {
+                                    showError(`cert-file-error-${index}`, 'Please upload certificate photo');
+                                    isValid = false;
+                                } else {
+                                    // Check file size for certification files
+                                    if (certFile.files[0] && certFile.files[0].size > MAX_CERTIFICATION_FILE_SIZE) {
+                                        showError(`cert-file-error-${index}`, 'File size exceeds the 20MB limit');
+                                        isValid = false;
+                                    } else {
+                                        hideError(`cert-file-error-${index}`);
+                                    }
+                                }
+                                
+                                // If all fields for this certification are valid
+                                if (isNameFilled && isOrgFilled && isYearFilled && isFileUploaded) {
+                                    hasAtLeastOneValidCertification = true;
+                                }
+                            } else {
+                                // This certification is completely empty, skip it
+                            }
+                        });
+                        
+                        // If no certification has all fields filled, show error
+                        if (!hasAtLeastOneValidCertification) {
+                            isValid = false;
+                        }
+                    }
+                }
+                
+                if ((step === 5 && selectedRole === 'client') || (step === 6 && selectedRole === 'counsellor')) {
+                    // Terms validation
+                    if (selectedRole === 'client') {
+                        if (!validateClientTerms()) {
+                            isValid = false;
+                        }
+                    } else if (selectedRole === 'counsellor') {
+                        if (!validateCounsellorTerms()) {
+                            isValid = false;
+                        }
+                        
+                        // Document validation for counsellor
+                        const licenseDocument = document.getElementById('license-document');
+                        if (!licenseDocument.files.length) {
+                            showError('license-document-error', 'Please upload your license document');
+                            isValid = false;
+                        } else {
+                            hideError('license-document-error');
+                            // Check file size
+                            if (licenseDocument.files[0].size > MAX_FILE_SIZE) {
+                                showError('license-document-size-error', 'File size exceeds the 20MB limit');
+                                isValid = false;
+                            } else {
+                                hideError('license-document-size-error');
+                            }
+                        }
+                        
+                        const degreeCertificate = document.getElementById('degree-certificate');
+                        if (!degreeCertificate.files.length) {
+                            showError('degree-certificate-error', 'Please upload your degree certificate');
+                            isValid = false;
+                        } else {
+                            hideError('degree-certificate-error');
+                            // Check file size
+                            if (degreeCertificate.files[0].size > MAX_FILE_SIZE) {
+                                showError('degree-certificate-size-error', 'File size exceeds the 20MB limit');
+                                isValid = false;
+                            } else {
+                                hideError('degree-certificate-size-error');
+                            }
+                        }
+                        
+                        const idProof = document.getElementById('id-proof');
+                        if (!idProof.files.length) {
+                            showError('id-proof-error', 'Please upload your ID proof');
+                            isValid = false;
+                        } else {
+                            hideError('id-proof-error');
+                            // Check file size
+                            if (idProof.files[0].size > MAX_FILE_SIZE) {
+                                showError('id-proof-size-error', 'File size exceeds the 20MB limit');
+                                isValid = false;
+                            } else {
+                                hideError('id-proof-size-error');
+                            }
+                        }
+                    }
+                }
+                
+                return isValid;
+            }
+            
+            // Collect all form data
+            function collectFormData() {
+                const formData = new FormData();
+                
+                // Add CSRF token
+                formData.append('csrfmiddlewaretoken', csrfTokenInput.value);
+                
+                // Add role
+                formData.append('role', selectedRole);
+                
+                // Common fields for both roles
+                formData.append('first_name', document.getElementById('first-name').value);
+                formData.append('last_name', document.getElementById('last-name').value);
+                formData.append('gender', document.getElementById('gender').value);
+                formData.append('email', document.getElementById('email').value);
+                formData.append('phone', document.getElementById('phone').value);
+                formData.append('password', document.getElementById('password').value);
+                
+                // Profile picture
+                const profilePicture = document.getElementById('profile-picture').files[0];
+                if (profilePicture) {
+                    formData.append('profile_picture', profilePicture);
+                }
+                
+                if (selectedRole === 'client') {
+                    // Client specific fields
+                    formData.append('date_of_birth', document.getElementById('date-of-birth').value);
+                    formData.append('primary_concern', document.getElementById('client-primary-concern').value);
+                    
+                    const otherConcern = document.getElementById('other-primary-concern').value;
+                    if (otherConcern) {
+                        formData.append('other_primary_concern', otherConcern);
+                    }
+                    
+                    formData.append('about_me', document.getElementById('client-about-me').value);
+                    formData.append('terms_accepted', document.getElementById('client-terms').checked);
+                    
+                } else if (selectedRole === 'counsellor') {
+                    // Counsellor professional information
+                    formData.append('license_number', document.getElementById('license-number').value);
+                    formData.append('license_type', document.getElementById('license-type').value);
+                    
+                    const otherLicenseType = document.getElementById('other-license-type').value;
+                    if (otherLicenseType) {
+                        formData.append('other_license_type', otherLicenseType);
+                    }
+                    
+                    formData.append('license_authority', document.getElementById('license-authority').value);
+                    formData.append('license_expiry', document.getElementById('license-expiry').value);
+                    formData.append('years_experience', document.getElementById('years-experience').value);
+                    formData.append('highest_degree', document.getElementById('highest-degree').value);
+                    formData.append('university', document.getElementById('university').value);
+                    formData.append('graduation_year', document.getElementById('graduation-year').value);
+                    
+                    // Specializations
+                    const specializations = Array.from(document.querySelectorAll('.specialization-checkbox:checked'))
+                        .map(cb => cb.value);
+                    specializations.forEach(spec => {
+                        formData.append('specializations', spec);
+                    });
+                    
+                    // Therapy approaches
+                    const approaches = Array.from(document.querySelectorAll('.therapy-approach-checkbox:checked'))
+                        .map(cb => cb.value);
+                    approaches.forEach(approach => {
+                        formData.append('therapy_approaches', approach);
+                    });
+                    
+                    // Practice details
+                    formData.append('session_fee', document.getElementById('session-fee').value);
+                    formData.append('google_meet_link', document.getElementById('google-meet-link').value);
+                    formData.append('professional_experience', document.getElementById('professional-experience').value);
+                    formData.append('about_me', document.getElementById('counsellor-about-me').value);
+                    
+                    // Languages
+                    const languages = Array.from(document.querySelectorAll('input[type="checkbox"][id^="lang-"]:checked'))
+                        .map(cb => cb.value);
+                    languages.forEach(lang => {
+                        formData.append('languages', lang);
+                    });
+                    
+                    // Age groups
+                    const ageGroups = Array.from(document.querySelectorAll('input[type="checkbox"][id^="age-"]:checked'))
+                        .map(cb => cb.value);
+                    ageGroups.forEach(ageGroup => {
+                        formData.append('age_groups', ageGroup);
+                    });
+                    
+                    // Certifications
+                    const certificationFields = certificationsContainer.querySelectorAll('.certification-field');
+                    certificationFields.forEach((field, index) => {
+                        const certName = field.querySelector('input[name="certification-name[]"]').value;
+                        const certOrg = field.querySelector('input[name="certification-organization[]"]').value;
+                        const certYear = field.querySelector('input[name="certification-year[]"]').value;
+                        const certFile = field.querySelector('input[type="file"]').files[0];
+                        
+                        if (certName && certOrg && certYear) {
+                            formData.append(`certification_name_${index}`, certName);
+                            formData.append(`certification_organization_${index}`, certOrg);
+                            formData.append(`certification_year_${index}`, certYear);
+                            
+                            if (certFile) {
+                                formData.append(`certification_file_${index}`, certFile);
+                            }
+                        }
+                    });
+                    
+                    // Documents
+                    const licenseDoc = document.getElementById('license-document').files[0];
+                    if (licenseDoc) {
+                        formData.append('license_document', licenseDoc);
+                    }
+                    
+                    const degreeCert = document.getElementById('degree-certificate').files[0];
+                    if (degreeCert) {
+                        formData.append('degree_certificate', degreeCert);
+                    }
+                    
+                    const idProof = document.getElementById('id-proof').files[0];
+                    if (idProof) {
+                        formData.append('id_proof', idProof);
+                    }
+                    
+                    // Terms
+                    formData.append('terms_accepted', document.getElementById('counsellor-terms').checked);
+                    formData.append('consent_given', document.getElementById('consent').checked);
+                }
+                
+                return formData;
+            }
+            
+            // Print form data to console
+            function printFormDataToConsole(formData) {
+                console.log('=== FORM DATA TO BE SENT ===');
+                console.log('Role:', selectedRole);
+                
+                for (let [key, value] of formData.entries()) {
+                    if (value instanceof File) {
+                        console.log(`${key}: File - ${value.name} (${value.type}, ${value.size} bytes)`);
+                    } else {
+                        console.log(`${key}: ${value}`);
+                    }
+                }
+                console.log('=== END FORM DATA ===');
+            }
+            
+            // Form submission
+            document.querySelectorAll('button[type="submit"]').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    if (validateStep(currentStep)) {
+                        // Show loader
+                        formLoader.style.display = 'flex';
+                        
+                        // Disable all form buttons to prevent multiple submissions
+                        document.querySelectorAll('button').forEach(btn => {
+                            btn.disabled = true;
+                        });
+
+                        document.getElementById('client-verify-btn').removeAttribute('disabled');
+                        document.getElementById('counsellor-verify-btn').removeAttribute('disabled');
+                        
+                        // Collect all form data
+                        const formData = collectFormData();
+                        
+                        // Print data to console
+                        printFormDataToConsole(formData);
+                        
+                        // Send data to Django backend
+                        fetch('/accounts/register/create/', {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-CSRFToken': csrfTokenInput.value,
+                            }
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Success:', data);
+                            
+                            // Hide loader
+                            formLoader.style.display = 'none';
+                            
+                            // Show appropriate success modal based on role
+                            if (selectedRole === 'client') {
+                                clientSuccessModal.classList.remove('hidden');
+                            } else if (selectedRole === 'counsellor') {
+                                counsellorSuccessModal.classList.remove('hidden');
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
+                            
+                            // Hide loader
+                            formLoader.style.display = 'none';
+                            
+                            // Re-enable buttons
+                            document.querySelectorAll('button').forEach(btn => {
+                                btn.disabled = false;
+                            });
+                            
+                            alert('There was an error with your registration. Please try again.');
+                        });
+                    }
+                });
+            });
+            
+            // Password strength indicator
+            const passwordInput = document.getElementById('password');
+            const strengthBar = document.querySelector('.password-strength');
+            const strengthText = document.getElementById('password-strength-text');
+            
+            if (passwordInput && strengthBar && strengthText) {
+                passwordInput.addEventListener('input', function() {
+                    const password = this.value;
+                    let strength = 0;
+                    
+                    if (password.length >= 8) strength++;
+                    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+                    if (/\d/.test(password)) strength++;
+                    if (/[^a-zA-Z\d]/.test(password)) strength++;
+                    
+                    if (password.length === 0) {
+                        strengthBar.className = 'password-strength';
+                        strengthText.textContent = '';
+                    } else if (strength <= 1) {
+                        strengthBar.className = 'password-strength weak';
+                        strengthText.textContent = 'Weak password';
+                        strengthText.className = 'text-xs text-red-500 mt-1';
+                    } else if (strength <= 3) {
+                        strengthBar.className = 'password-strength medium';
+                        strengthText.textContent = 'Medium strength password';
+                        strengthText.className = 'text-xs text-yellow-500 mt-1';
+                    } else {
+                        strengthBar.className = 'password-strength strong';
+                        strengthText.textContent = 'Strong password';
+                        strengthText.className = 'text-xs text-green-500 mt-1';
+                    }
+                });
+            }
+            
+            // Show password toggle
+            const showPasswordCheckbox = document.getElementById('show-password');
+            if (showPasswordCheckbox) {
+                showPasswordCheckbox.addEventListener('change', function() {
+                    const passwordFields = document.querySelectorAll('.password-field');
+                    passwordFields.forEach(field => {
+                        field.type = this.checked ? 'text' : 'password';
+                    });
+                });
+            }
+            
+            // Specializations tag display
+            const specializationCheckboxes = document.querySelectorAll('.specialization-checkbox');
+            const selectedSpecializationsContainer = document.getElementById('selected-specializations');
+            
+            specializationCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    updateSelectedSpecializations();
+                });
+            });
+            
+            function updateSelectedSpecializations() {
+                const selectedSpecializations = document.querySelectorAll('.specialization-checkbox:checked');
+                if (selectedSpecializationsContainer) {
+                    selectedSpecializationsContainer.innerHTML = '';
+                    
+                    if (selectedSpecializations.length > 0) {
+                        selectedSpecializationsContainer.classList.remove('hidden');
+                        selectedSpecializations.forEach(checkbox => {
+                            const tag = document.createElement('div');
+                            tag.className = 'specialization-tag';
+                            tag.innerHTML = `
+                                ${checkbox.value}
+                                <button type="button" class="ml-2 text-indigo-600 hover:text-indigo-800" data-id="${checkbox.id}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            `;
+                            selectedSpecializationsContainer.appendChild(tag);
+                        });
+                        
+                        // Add event listeners to remove buttons
+                        selectedSpecializationsContainer.querySelectorAll('button').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const checkboxId = this.getAttribute('data-id');
+                                document.getElementById(checkboxId).checked = false;
+                                updateSelectedSpecializations();
+                            });
+                        });
+                    } else {
+                        selectedSpecializationsContainer.classList.add('hidden');
+                    }
+                }
+            }
+            
+            // Therapy Approaches tag display
+            const approachCheckboxes = document.querySelectorAll('.therapy-approach-checkbox');
+            const selectedApproachesContainer = document.getElementById('selected-approaches');
+            
+            approachCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    updateSelectedApproaches();
+                });
+            });
+            
+            function updateSelectedApproaches() {
+                const selectedApproaches = document.querySelectorAll('.therapy-approach-checkbox:checked');
+                if (selectedApproachesContainer) {
+                    selectedApproachesContainer.innerHTML = '';
+                    
+                    if (selectedApproaches.length > 0) {
+                        selectedApproachesContainer.classList.remove('hidden');
+                        selectedApproaches.forEach(checkbox => {
+                            const tag = document.createElement('div');
+                            tag.className = 'specialization-tag';
+                            tag.innerHTML = `
+                                ${checkbox.value}
+                                <button type="button" class="ml-2 text-indigo-600 hover:text-indigo-800" data-id="${checkbox.id}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            `;
+                            selectedApproachesContainer.appendChild(tag);
+                        });
+                        
+                        // Add event listeners to remove buttons
+                        selectedApproachesContainer.querySelectorAll('button').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const checkboxId = this.getAttribute('data-id');
+                                document.getElementById(checkboxId).checked = false;
+                                updateSelectedApproaches();
+                            });
+                        });
+                    } else {
+                        selectedApproachesContainer.classList.add('hidden');
+                    }
+                }
+            }
+            
+            // Add Certification Field
+            function addCertificationField() {
+                const certificationCount = certificationsContainer.children.length;
+                const certificationIndex = certificationCount;
+                
+                const certificationDiv = document.createElement('div');
+                certificationDiv.className = 'certification-field bg-slate-50 p-4 rounded-lg mb-4';
+                certificationDiv.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-medium text-slate-800">${certificationIndex + 1}. Certification</h4>
+                        ${certificationCount > 0 ? `<button type="button" class="remove-certification text-red-600 hover:text-red-800">
+                            <i class="fas fa-times"></i>
+                        </button>` : ''}
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Certification Name</label>
+                            <input type="text" name="certification-name[]" class="w-full px-4 py-2 border border-slate-300 rounded-lg input-focus transition-all certification-input" placeholder="e.g., Certified Trauma Professional">
+                            <div class="error-message mt-2 text-red-600 text-sm hidden" id="cert-name-error-${certificationIndex}">Please enter certification name</div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Issuing Organization</label>
+                            <input type="text" name="certification-organization[]" class="w-full px-4 py-2 border border-slate-300 rounded-lg input-focus transition-all certification-input" placeholder="e.g., International Association of Trauma Professionals">
+                            <div class="error-message mt-2 text-red-600 text-sm hidden" id="cert-org-error-${certificationIndex}">Please enter issuing organization</div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Year Obtained</label>
+                            <input type="number" name="certification-year[]" class="w-full px-4 py-2 border border-slate-300 rounded-lg input-focus transition-all certification-input" placeholder="e.g., 2022" min="1950" max="2030">
+                            <div class="error-message mt-2 text-red-600 text-sm hidden" id="cert-year-error-${certificationIndex}">Please enter a valid year</div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Certificate Photo</label>
+                            <div class="flex items-center justify-center w-full">
+                                <label for="certification-${certificationIndex}" class="flex flex-col items-center justify-center w-full h-20 border-2 border-slate-300 border-dashed rounded-lg cursor-pointer bg-white file-hover transition-colors">
+                                    <div class="flex flex-col items-center justify-center" id="certification-${certificationIndex}-upload-content">
+                                        <i class="fas fa-cloud-upload-alt text-slate-400 mb-1" id="certification-${certificationIndex}-upload-icon"></i>
+                                        <p class="text-xs text-slate-500" id="certification-${certificationIndex}-file-text">Upload Certificate</p>
+                                    </div>
+                                    <input id="certification-${certificationIndex}" type="file" class="hidden certification-input" accept=".pdf,.jpg,.jpeg,.png">
+                                </label>
+                            </div>
+                            <div class="error-message mt-2 text-red-600 text-sm hidden" id="cert-file-error-${certificationIndex}">Please upload certificate photo</div>
+                            <div class="error-message mt-2 text-red-600 text-sm hidden" id="cert-file-size-error-${certificationIndex}">File size exceeds the 20MB limit</div>
+                        </div>
+                    </div>
+                `;
+                
+                certificationsContainer.appendChild(certificationDiv);
+                
+                // Add event listener to remove button
+                const removeButton = certificationDiv.querySelector('.remove-certification');
+                if (removeButton) {
+                    removeButton.addEventListener('click', function() {
+                        certificationDiv.remove();
+                    });
+                }
+                
+                // Setup file upload for the new certification
+                const certFileInput = certificationDiv.querySelector('input[type="file"]');
+                setupCertificationFileUpload(certFileInput, `certification-${certificationIndex}`);
+                
+                // Add real-time validation for certification fields
+                const certNameInput = certificationDiv.querySelector('input[name="certification-name[]"]');
+                const certOrgInput = certificationDiv.querySelector('input[name="certification-organization[]"]');
+                const certYearInput = certificationDiv.querySelector('input[name="certification-year[]"]');
+                
+                // Add event listeners for real-time validation
+                certNameInput.addEventListener('input', function() {
+                    validateCertificationField(this, 'name', certificationIndex);
+                });
+                certNameInput.addEventListener('blur', function() {
+                    validateCertificationField(this, 'name', certificationIndex);
+                });
+                
+                certOrgInput.addEventListener('input', function() {
+                    validateCertificationField(this, 'organization', certificationIndex);
+                });
+                certOrgInput.addEventListener('blur', function() {
+                    validateCertificationField(this, 'organization', certificationIndex);
+                });
+                
+                certYearInput.addEventListener('input', function() {
+                    validateCertificationField(this, 'year', certificationIndex);
+                });
+                certYearInput.addEventListener('blur', function() {
+                    validateCertificationField(this, 'year', certificationIndex);
+                });
+                
+                certFileInput.addEventListener('change', function() {
+                    validateCertificationField(this, 'file', certificationIndex);
+                });
+            }
+            
+            // Real-time validation for certification fields
+            function validateCertificationField(field, type, index) {
+                const errorId = `cert-${type}-error-${index}`;
+                const sizeErrorId = `cert-file-size-error-${index}`;
+                
+                if (type === 'name') {
+                    if (!field.value.trim()) {
+                        showError(errorId, 'Please enter certification name');
+                        field.classList.add('input-error');
+                    } else {
+                        hideError(errorId);
+                        field.classList.remove('input-error');
+                    }
+                } else if (type === 'organization') {
+                    if (!field.value.trim()) {
+                        showError(errorId, 'Please enter issuing organization');
+                        field.classList.add('input-error');
+                    } else {
+                        hideError(errorId);
+                        field.classList.remove('input-error');
+                    }
+                } else if (type === 'year') {
+                    if (!field.value.trim()) {
+                        showError(errorId, 'Please enter year obtained');
+                        field.classList.add('input-error');
+                    } else if (field.value && (field.value < 1950 || field.value > new Date().getFullYear())) {
+                        showError(errorId, 'Please enter a valid year');
+                        field.classList.add('input-error');
+                    } else {
+                        hideError(errorId);
+                        field.classList.remove('input-error');
+                    }
+                } else if (type === 'file') {
+                    if (!field.files.length) {
+                        showError(errorId, 'Please upload certificate photo');
+                        hideError(sizeErrorId);
+                        // Reset file upload styling to default
+                        const uploadIcon = document.getElementById(`certification-${index}-upload-icon`);
+                        const fileText = document.getElementById(`certification-${index}-file-text`);
+                        const fileUploadLabel = document.querySelector(`label[for="certification-${index}"]`);
+                        
+                        if (uploadIcon && fileText && fileUploadLabel) {
+                            uploadIcon.className = 'fas fa-cloud-upload-alt text-slate-400 mb-1';
+                            fileText.textContent = 'Upload Certificate';
+                            fileUploadLabel.classList.remove('border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50');
+                            fileUploadLabel.classList.add('border-slate-300', 'bg-white');
+                        }
+                    } else {
+                        hideError(errorId);
+                        // Check file size
+                        if (field.files[0].size > MAX_CERTIFICATION_FILE_SIZE) {
+                            showError(sizeErrorId, 'File size exceeds the 20MB limit');
+                            const uploadIcon = document.getElementById(`certification-${index}-upload-icon`);
+                            const fileText = document.getElementById(`certification-${index}-file-text`);
+                            const fileUploadLabel = document.querySelector(`label[for="certification-${index}"]`);
+                            
+                            if (uploadIcon && fileText && fileUploadLabel) {
+                                uploadIcon.className = 'fas fa-file-exclamation text-red-500 mb-1';
+                                fileText.innerHTML = `<span class="font-semibold text-red-600">File too large</span>`;
+                                fileUploadLabel.classList.remove('border-slate-300', 'bg-white', 'border-green-500', 'bg-green-50');
+                                fileUploadLabel.classList.add('border-red-500', 'bg-red-50');
+                            }
+                        } else {
+                            hideError(sizeErrorId);
+                            const fileName = field.files[0].name;
+                            const uploadIcon = document.getElementById(`certification-${index}-upload-icon`);
+                            const fileText = document.getElementById(`certification-${index}-file-text`);
+                            const fileUploadLabel = document.querySelector(`label[for="certification-${index}"]`);
+                            
+                            if (uploadIcon && fileText && fileUploadLabel) {
+                                uploadIcon.className = 'fas fa-file-check text-green-500 mb-1';
+                                fileText.innerHTML = `<span class="font-semibold text-green-600">${fileName}</span>`;
+                                fileUploadLabel.classList.remove('border-slate-300', 'bg-white', 'border-red-500', 'bg-red-50');
+                                fileUploadLabel.classList.add('border-green-500', 'bg-green-50');
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Setup certification file upload
+            function setupCertificationFileUpload(fileInput, certificationId) {
+                fileInput.addEventListener('change', function(e) {
+                    if (this.files.length > 0) {
+                        const fileName = this.files[0].name;
+                        const uploadIcon = document.getElementById(`${certificationId}-upload-icon`);
+                        const fileText = document.getElementById(`${certificationId}-file-text`);
+                        const fileUploadLabel = document.querySelector(`label[for="${this.id}"]`);
+                        
+                        if (uploadIcon && fileText && fileUploadLabel) {
+                            // Check file size
+                            if (this.files[0].size > MAX_CERTIFICATION_FILE_SIZE) {
+                                uploadIcon.className = 'fas fa-file-exclamation text-red-500 mb-1';
+                                fileText.innerHTML = `<span class="font-semibold text-red-600">File too large</span>`;
+                                fileUploadLabel.classList.remove('border-slate-300', 'bg-white', 'border-green-500', 'bg-green-50');
+                                fileUploadLabel.classList.add('border-red-500', 'bg-red-50');
+                            } else {
+                                uploadIcon.className = 'fas fa-file-check text-green-500 mb-1';
+                                fileText.innerHTML = `<span class="font-semibold text-green-600">${fileName}</span>`;
+                                fileUploadLabel.classList.remove('border-slate-300', 'bg-white', 'border-red-500', 'bg-red-50');
+                                fileUploadLabel.classList.add('border-green-500', 'bg-green-50');
+                            }
+                        }
+                    } else {
+                        const uploadIcon = document.getElementById(`${certificationId}-upload-icon`);
+                        const fileText = document.getElementById(`${certificationId}-file-text`);
+                        const fileUploadLabel = document.querySelector(`label[for="${this.id}"]`);
+                        
+                        if (uploadIcon && fileText && fileUploadLabel) {
+                            uploadIcon.className = 'fas fa-cloud-upload-alt text-slate-400 mb-1';
+                            fileText.textContent = 'Upload Certificate';
+                            fileUploadLabel.classList.remove('border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50');
+                            fileUploadLabel.classList.add('border-slate-300', 'bg-white');
+                        }
+                    }
+                });
+            }
+            
+            // Setup file upload functionality
+            function setupFileUpload(fileInput, type) {
+                fileInput.addEventListener('change', function(e) {
+                    if (this.files.length > 0) {
+                        const fileName = this.files[0].name;
+                        const uploadIcon = document.getElementById(`${type}-upload-icon`);
+                        const fileText = document.getElementById(`${type}-file-text`);
+                        const fileSubtext = document.getElementById(`${type}-file-subtext`);
+                        const fileUploadLabel = document.querySelector(`label[for="${this.id}"]`);
+                        
+                        if (uploadIcon && fileText && fileSubtext && fileUploadLabel) {
+                            // Check file size
+                            if (this.files[0].size > MAX_FILE_SIZE) {
+                                uploadIcon.className = 'fas fa-file-exclamation text-red-500 text-2xl mb-2';
+                                fileText.innerHTML = `<span class="font-semibold text-red-600">File too large</span>`;
+                                fileSubtext.textContent = 'File size exceeds the 20MB limit';
+                                fileUploadLabel.classList.remove('border-slate-300', 'bg-slate-50', 'border-green-500', 'bg-green-50');
+                                fileUploadLabel.classList.add('border-red-500', 'bg-red-50');
+                            } else {
+                                uploadIcon.className = 'fas fa-file-check text-green-500 text-2xl mb-2';
+                                fileText.innerHTML = `<span class="font-semibold text-green-600">${fileName}</span>`;
+                                fileSubtext.textContent = 'Document selected successfully';
+                                fileUploadLabel.classList.remove('border-slate-300', 'bg-slate-50', 'border-red-500', 'bg-red-50');
+                                fileUploadLabel.classList.add('border-green-500', 'bg-green-50');
+                            }
+                        }
+                    } else {
+                        const uploadIcon = document.getElementById(`${type}-upload-icon`);
+                        const fileText = document.getElementById(`${type}-file-text`);
+                        const fileSubtext = document.getElementById(`${type}-file-subtext`);
+                        const fileUploadLabel = document.querySelector(`label[for="${this.id}"]`);
+                        
+                        if (uploadIcon && fileText && fileSubtext && fileUploadLabel) {
+                            uploadIcon.className = 'fas fa-cloud-upload-alt text-slate-400 text-2xl mb-2';
+                            fileText.innerHTML = '<span class="font-semibold">Click to upload</span> or drag and drop';
+                            fileSubtext.textContent = 'PDF, JPG, PNG (MAX. 20MB)';
+                            fileUploadLabel.classList.remove('border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50');
+                            fileUploadLabel.classList.add('border-slate-300', 'bg-slate-50');
+                        }
+                    }
+                });
+            }
+            
+            // Add initial certification field
+            addCertificationField();
+            
+            // Input field animations
+            document.querySelectorAll('.input-field').forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.classList.add('ring-2', 'ring-indigo-500', 'ring-opacity-50');
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.classList.remove('ring-2', 'ring-indigo-500', 'ring-opacity-50');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

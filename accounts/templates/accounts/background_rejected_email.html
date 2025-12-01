@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @media only screen and (max-width: 600px) {
+            body { width: 100% !important; min-width: 100% !important; }
+            table { width: 100% !important; }
+            .grid-cell { display: block !important; width: 100% !important; padding: 0 0 12px 0 !important; }
+            h1 { font-size: 24px !important; }
+            h3 { font-size: 14px !important; }
+            p { font-size: 13px !important; }
+            .button-row { display: block !important; }
+            .button-cell { display: block !important; width: 100% !important; padding: 8px 0 !important; }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; width: 100%;">
+    
+    <!-- Main Container -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 650px; margin: 0 auto; background-color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        
+        <!-- Header Section -->
+        <tr>
+            <td style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); padding: 50px 40px; text-align: center; color: white;">
+                
+                <!-- Logo -->
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 20px;">
+                    <tr>
+                        <td style="text-align: center;">
+                            <div style="display: inline-block; background: rgba(255,255,255,0.2); padding: 8px 10px; border-radius: 8px; font-size: 24px; margin-bottom: 12px;">
+                                🧠
+                            </div>
+                            <div style="display: inline-block; font-size: 32px; font-weight: bold; color: white; margin-left: 8px; vertical-align: middle;">MindEase</div>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Header Text -->
+                <h3 style="margin: 16px 0; font-size: 25px; font-weight: 700; color: white;">Verification Update</h3>
+                <p style="margin: 0 0 20px 0; font-size: 14px; color: rgba(255,255,255,0.9);">Important information about your application</p>
+                
+                <!-- Rejection Badge -->
+                <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
+                    <tr>
+                        <td style="background: rgba(220,38,38,0.2); padding: 8px 16px; border-radius: 20px; text-align: center;">
+                            <span style="font-size: 14px; font-weight: 600; color: #fecaca;">✕  Verification Rejected</span>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        
+        <!-- Content Section -->
+        <tr>
+            <td style="padding: 50px 40px; color: #475569; font-size: 15px; line-height: 1.8;">
+                
+                <!-- Greeting -->
+                <p style="margin: 0 0 24px 0; font-size: 16px; color: #1e293b;">
+                    Hello <strong style="color: #1e293b;">{{ user.first_name }} {{ user.last_name }}</strong>,
+                </p>
+                
+                <!-- Intro Text -->
+                <p style="margin: 0 0 32px 0; color: #475569; line-height: 1.8; font-size: 15px;">
+                    Thank you for submitting your background verification documents. We've carefully reviewed your application. Unfortunately, we were unable to approve it at this time due to some outstanding issues.
+                </p>
+                
+                <!-- Review Notes Card -->
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 32px; background-color: #fffbeb; border-left: 4px solid #f59e0b;">
+                    <tr>
+                        <td style="padding: 24px 24px;">
+                            <h3 style="margin: 0 0 12px 0; font-size: 18px; font-weight: 700; color: #92400e;">Review Notes</h3>
+                            <p style="margin: 0; font-size: 15px; color: #92400e; line-height: 1.6;">{{ notes }}</p>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Verification Status Title -->
+                <h3 style="margin: 0 0 20px 0; font-size: 16px; font-weight: 700; color: #1e293b;">Verification Status</h3>
+                
+                <!-- Verification Grid (2 columns) -->
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 32px;">
+                    <!-- Row 1 -->
+                    <tr>
+                        <!-- Box 1 - License Document -->
+                        <td style="padding: 0 8px 16px 0; vertical-align: top;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                <tr>
+                                    <td style="padding: 20px; text-align: center;">
+                                        <div style="font-size: 32px; margin-bottom: 12px;">📋</div>
+                                        <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #1e293b;">License Document</p>
+                                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td style="text-align: center;">
+                                                    {% if counsellor.background_verification.license_verified %}
+                                                    <span style="display: inline-block; background: #dcfce7; color: #10b981; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">✓ Verified</span>
+                                                    {% else %}
+                                                    <span style="display: inline-block; background: #fef2f2; color: #dc2626; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">✕ Not Verified</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        
+                        <!-- Box 2 - Degree Certificate -->
+                        <td style="padding: 0 0 16px 8px; vertical-align: top;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                <tr>
+                                    <td style="padding: 20px; text-align: center;">
+                                        <div style="font-size: 32px; margin-bottom: 12px;">🎓</div>
+                                        <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #1e293b;">Degree Certificate</p>
+                                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td style="text-align: center;">
+                                                    {% if counsellor.background_verification.degree_verified %}
+                                                    <span style="display: inline-block; background: #dcfce7; color: #10b981; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">✓ Verified</span>
+                                                    {% else %}
+                                                    <span style="display: inline-block; background: #fef2f2; color: #dc2626; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">✕ Not Verified</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Row 2 -->
+                    <tr>
+                        <!-- Box 3 - Identity Proof -->
+                        <td style="padding: 0 8px 0 0; vertical-align: top;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                <tr>
+                                    <td style="padding: 20px; text-align: center;">
+                                        <div style="font-size: 32px; margin-bottom: 12px;">🆔</div>
+                                        <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #1e293b;">Identity Proof</p>
+                                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td style="text-align: center;">
+                                                    {% if counsellor.background_verification.identity_verified %}
+                                                    <span style="display: inline-block; background: #dcfce7; color: #10b981; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">✓ Verified</span>
+                                                    {% else %}
+                                                    <span style="display: inline-block; background: #fef2f2; color: #dc2626; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">✕ Not Verified</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        
+                        <!-- Box 4 - Certifications -->
+                        <td style="padding: 0 0 0 8px; vertical-align: top;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                <tr>
+                                    <td style="padding: 20px; text-align: center;">
+                                        <div style="font-size: 32px; margin-bottom: 12px;">🏅</div>
+                                        <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #1e293b;">Certifications</p>
+                                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td style="text-align: center;">
+                                                    {% if counsellor.background_verification.certifications_verified %}
+                                                    <span style="display: inline-block; background: #dcfce7; color: #10b981; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">✓ Verified</span>
+                                                    {% else %}
+                                                    <span style="display: inline-block; background: #fef2f2; color: #dc2626; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">✕ Not Verified</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Next Steps Title -->
+                <h3 style="margin: 0 0 20px 0; font-size: 16px; font-weight: 700; color: #1e293b;">Next Steps</h3>
+                
+                <!-- Next Steps List -->
+                <table width="100%" cellpadding="3" cellspacing="5" border="0" style="margin-bottom: 32px;">
+                    <!-- Step 1 -->
+                    <tr>
+                        <td style="padding: 16px; margin-bottom: 12px; background-color: #f8fafc; border-left: 3px solid #dc2626; border-radius: 6px;">
+                            <p style="margin: 0 0 6px 0; font-size: 14px; font-weight: 600; color: #1e293b;">Review the Issues</p>
+                            <p style="margin: 0; font-size: 14px; color: #475569; line-height: 1.6;">Carefully review the issues highlighted in the notes above to understand what needs to be addressed.</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Step 2 -->
+                    <tr>
+                        <td style="padding: 16px; margin-bottom: 12px; background-color: #f8fafc; border-left: 3px solid #dc2626; border-radius: 6px;">
+                            <p style="margin: 0 0 6px 0; font-size: 14px; font-weight: 600; color: #1e293b;">Gather Updated Documents</p>
+                            <p style="margin: 0; font-size: 14px; color: #475569; line-height: 1.6;">Collect clear, updated documents that address all verification requirements and concerns raised.</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Step 3 -->
+                    <tr>
+                        <td style="padding: 16px; background-color: #f8fafc; border-left: 3px solid #dc2626; border-radius: 6px;">
+                            <p style="margin: 0 0 6px 0; font-size: 14px; font-weight: 600; color: #1e293b;">Reapply with Updated Documents</p>
+                            <p style="margin: 0; font-size: 14px; color: #475569; line-height: 1.6;">Create a new account with your corrected and verified documents. Our team will review your updated application promptly.</p>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- CTA Button -->
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 32px 0;">
+                    <tr>
+                        <td style="text-align: center;">
+                            <a href="{{ site_url }}/register/" style="display: inline-block; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 15px;">
+                                Create New Account
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Support Message -->
+                <p style="margin: 0; font-size: 14px; color: #64748b; text-align: center; line-height: 1.6;">
+                    We understand this may be frustrating. Our support team is here to help you through this process. Don't hesitate to reach out!
+                </p>
+                
+            </td>
+        </tr>
+        
+        <!-- Footer -->
+        <tr>
+            <td style="background-color: #f8fafc; padding: 36px 40px; text-align: center; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 13px;">
+                
+                <p style="margin: 0 0 8px 0; font-weight: 700; color: #1e293b; font-size: 14px;">MindEase - Mental Wellness Platform</p>
+                <p style="margin: 0 0 16px 0; font-size: 13px; color: #64748b;">Transforming mental health care, one session at a time</p>
+                
+                <p style="margin: 0; font-size: 12px; color: #94a3b8;">© 2024 MindEase. All rights reserved.</p>
+                
+            </td>
+        </tr>
+        
+    </table>
+
+</body>
+</html>

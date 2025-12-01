@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification - MindEase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #06b6d4;
+            --accent: #8b5cf6;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --text: #475569;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .animate-slide-up {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideUp 0.6s ease forwards;
+        }
+        
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in {
+            opacity: 0;
+            animation: fadeIn 0.8s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .btn-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .checkmark-animation {
+            animation: checkmark-draw 1s ease forwards;
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+        }
+        
+        @keyframes checkmark-draw {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        
+        .cross-animation {
+            animation: cross-draw 1s ease forwards;
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+        }
+        
+        @keyframes cross-draw {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(79, 70, 229, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+        }
+        
+        .loader-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .form-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .loader-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            text-align: center;
+            min-width: 320px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .loader-text {
+            margin-top: 1.5rem;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Content -->
+    <div class="max-w-2xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
+        <div class="flex flex-col min-h-[600px]">
+            <!-- Header Section -->
+            <div class="bg-gradient-to-br from-indigo-600 to-purple-700 text-white p-8 text-center">
+                <a href="/" class="inline-flex items-center text-white mb-6 animate-slide-up">
+                    <div class="h-10 w-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center mr-3">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <span class="text-xl font-bold">MindEase</span>
+                </a>
+                
+                <div class="w-24 h-24 mx-auto bg-white bg-opacity-20 rounded-full flex items-center justify-center mb-6">
+                    <div class="w-16 h-16 bg-white bg-opacity-30 rounded-full flex items-center justify-center">
+                        <i class="fas fa-envelope-open-text text-white text-3xl"></i>
+                    </div>
+                </div>
+                
+                <h1 class="text-3xl font-bold mb-4 animate-slide-up">Email Verification</h1>
+                <p class="text-indigo-100 max-w-md mx-auto animate-fade-in">Verifying your email address</p>
+            </div>
+            
+            <!-- Content Section -->
+            <div class="flex-1 p-8 lg:p-12">
+                <div class="max-w-md mx-auto text-center">
+                    <!-- Loading State -->
+                    <div id="loading-state" class="animate-fade-in">
+                        <div class="loader-spinner mb-6"></div>
+                        <h3 class="text-xl font-semibold text-slate-800 mb-2">Verifying your email...</h3>
+                        <p class="text-slate-600">Please wait while we verify your email address.</p>
+                    </div>
+                    
+                    <!-- Success Content (hidden by default) -->
+                    <div id="success-content" class="hidden animate-slide-up">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg class="w-10 h-10 text-green-600 checkmark-animation" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">Email Verified Successfully!</h3>
+                        <p class="text-slate-600 mb-2" id="success-main-message">Your email address has been successfully verified.</p>
+                        <p class="text-slate-600 mb-8" id="success-role-message"></p>
+                        
+                        <div class="space-y-4">
+                            <button id="go-to-login-btn" class="w-full bg-indigo-600 text-white py-3.5 rounded-lg font-medium btn-hover pulse-glow">
+                                <i class="fas fa-sign-in-alt mr-2"></i> Continue to Login
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Already Verified Content (hidden by default) -->
+                    <div id="already-verified-content" class="hidden animate-slide-up">
+                        <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-check-double text-blue-600 text-2xl"></i>
+                        </div>
+                        
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">Email Already Verified</h3>
+                        {% comment %} <p class="text-slate-600 mb-2">Your email address was already verified previously.</p> {% endcomment %}
+                        <p class="text-slate-600 mb-8" id="already-verified-role-message"></p>
+                        
+                        <div class="space-y-4">
+                            <button id="already-verified-login-btn" class="w-full bg-indigo-600 text-white py-3.5 rounded-lg font-medium btn-hover pulse-glow">
+                                <i class="fas fa-sign-in-alt mr-2"></i> Continue to Login
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Error Content (hidden by default) -->
+                    <div id="error-content" class="hidden animate-slide-up">
+                        <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg class="w-10 h-10 text-red-600 cross-animation" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </div>
+                        
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">Verification Failed</h3>
+                        <p class="text-slate-600 mb-6" id="error-message">Invalid or expired verification token.</p>
+                        
+                        <div class="space-y-4">
+                            <button id="go-to-verify-page-btn" class="w-full bg-indigo-600 text-white py-3.5 rounded-lg font-medium btn-hover">
+                                <i class="fas fa-envelope mr-2"></i> Go to Email Verification
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loader -->
+    <div id="form-loader" class="form-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <div class="loader-text">Processing...</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const loadingState = document.getElementById('loading-state');
+            const successContent = document.getElementById('success-content');
+            const alreadyVerifiedContent = document.getElementById('already-verified-content');
+            const errorContent = document.getElementById('error-content');
+            const goToLoginBtn = document.getElementById('go-to-login-btn');
+            const alreadyVerifiedLoginBtn = document.getElementById('already-verified-login-btn');
+            const goToVerifyPageBtn = document.getElementById('go-to-verify-page-btn');
+            const successMainMessage = document.getElementById('success-main-message');
+            const successRoleMessage = document.getElementById('success-role-message');
+            const alreadyVerifiedRoleMessage = document.getElementById('already-verified-role-message');
+            const errorMessage = document.getElementById('error-message');
+            const formLoader = document.getElementById('form-loader');
+
+            // Get token from Django template
+            const token = "{{ token }}";
+
+            // Verify email on page load
+            if (token) {
+                verifyEmail(token);
+            } else {
+                showError('Invalid verification link');
+            }
+
+            // Verify email function
+            function verifyEmail(token) {
+                if (!token) {
+                    showError('Invalid verification link');
+                    return;
+                }
+
+                // Show loading state
+                formLoader.style.display = 'flex';
+
+                fetch(`/accounts/api/verify-email/${token}/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken(),
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        // For 400 errors, get the JSON error message
+                        if (response.status === 400) {
+                            return response.json().then(errorData => {
+                                // Check if this is an "already verified" scenario
+                                if (errorData.error && errorData.error.includes('already verified')) {
+                                    throw new Error('ALREADY_VERIFIED:' + (errorData.user_email || ''));
+                                }
+                                throw new Error(errorData.error || 'Verification failed');
+                            });
+                        }
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    formLoader.style.display = 'none';
+                    
+                    if (data.success) {
+                        showSuccess(data.role, data.user_email);
+                    } else {
+                        showError(data.error || 'Verification failed');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    formLoader.style.display = 'none';
+                    
+                    // Handle already verified case
+                    if (error.message.startsWith('ALREADY_VERIFIED:')) {
+                        const userEmail = error.message.split(':')[1];
+                        showAlreadyVerified(userEmail);
+                    } 
+                    // Only show network error for actual network issues
+                    else if (error.message.includes('Network') || error.message.includes('Failed to fetch')) {
+                        showError('Network error. Please check your connection and try again.');
+                    } else {
+                        // For server errors, use the actual error message
+                        showError(error.message || 'Verification failed. The link may be invalid or expired.');
+                    }
+                });
+            }
+
+            // Show success state for fresh verification
+            function showSuccess(role, userEmail) {
+                loadingState.classList.add('hidden');
+                successContent.classList.remove('hidden');
+                
+                // Set role-specific messages
+                if (role === 'client') {
+                    successMainMessage.textContent = 'Your email has been verified successfully!';
+                    successRoleMessage.textContent = 'Your client account is now active. You can log in and start your mental wellness journey.';
+                } else if (role === 'counsellor') {
+                    successMainMessage.textContent = 'Your email has been verified successfully!';
+                    successRoleMessage.textContent = 'Your counsellor account email is now verified. Your account will be activated after background verification is completed.';
+                } else {
+                    successMainMessage.textContent = 'Your email has been verified successfully!';
+                    successRoleMessage.textContent = 'Your account has been successfully verified.';
+                }
+            }
+
+            // Show already verified state
+            function showAlreadyVerified(userEmail) {
+                loadingState.classList.add('hidden');
+                alreadyVerifiedContent.classList.remove('hidden');
+                
+                // Set appropriate message
+                if (userEmail) {
+                    alreadyVerifiedRoleMessage.textContent = `Your email ${userEmail} was already verified.`;
+                } else {
+                    alreadyVerifiedRoleMessage.textContent = 'Your email was already verified previously.';
+                }
+            }
+
+            // Show error state
+            function showError(message) {
+                loadingState.classList.add('hidden');
+                errorContent.classList.remove('hidden');
+                errorMessage.textContent = message;
+            }
+
+            // Get CSRF token function
+            function getCSRFToken() {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, 'csrftoken'.length + 1) === ('csrftoken' + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring('csrftoken'.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            // Button event listeners
+            goToLoginBtn.addEventListener('click', function() {
+                window.location.href = '/accounts/login/';
+            });
+
+            alreadyVerifiedLoginBtn.addEventListener('click', function() {
+                window.location.href = '/accounts/login/';
+            });
+
+            goToVerifyPageBtn.addEventListener('click', function() {
+                // Redirect to email verification page
+                window.location.href = '/accounts/email_verify/';
+            });
+        });
+    </script>
+</body>
+</html>

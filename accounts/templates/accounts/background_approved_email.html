@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc;">
+    
+    <!-- Main Container -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 650px; margin: 0 auto; background-color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        
+        <!-- Header Section -->
+        <tr>
+            <td style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); padding: 50px 40px; text-align: center; color: white;">
+                
+                <!-- Logo -->
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 20px;">
+                    <tr>
+                        <td style="text-align: center;">
+                            <div style="display: inline-block; background: rgba(255,255,255,0.2); padding: 8px 10px; border-radius: 8px; font-size: 24px; margin-bottom: 12px;">
+                                🧠
+                            </div>
+                            <div style="display: inline-block; font-size: 32px; font-weight: bold; color: white; margin-left: 8px; vertical-align: middle;">MindEase</div>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Header Text -->
+                <h3 style="margin: 16px 0; font-size: 25px; font-weight: 700; color: white;">Registration Approved!</h3>
+                <p style="margin: 0 0 20px 0; font-size: 14px; color: rgba(255,255,255,0.9);">Welcome to our community of professional therapists</p>
+                
+                <!-- Success Badge -->
+                <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
+                    <tr>
+                        <td style="background: rgba(16,185,129,0.2); padding: 8px 16px; border-radius: 20px; text-align: center;">
+                            <span style="font-size: 14px; font-weight: 600; color: #10b981;">✓ Verification Complete</span>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        
+        <!-- Content Section -->
+        <tr>
+            <td style="padding: 50px 40px; color: #475569; font-size: 15px; line-height: 1.8;">
+                
+                <!-- Greeting -->
+                <p style="margin: 0 0 24px 0; font-size: 16px; color: #1e293b;">
+                    Hello <strong style="color: #4f46e5;">{{ user.first_name }} {{ user.last_name }}</strong>,
+                </p>
+                
+                <!-- Intro Text -->
+                <p style="margin: 0 0 32px 0; color: #475569; line-height: 1.8;">
+                    Congratulations! Your background verification has been successfully completed and approved. We're thrilled to welcome you to the MindEase platform and excited about the positive impact you'll make in our community.
+                </p>
+                
+                <!-- Welcome Card -->
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 32px; background-color: #f0f9ff; border-left: 4px solid #4f46e5;">
+                    <tr>
+                        <td style="padding: 24px 24px;">
+                            <h3 style="margin: 0 0 12px 0; font-size: 18px; font-weight: 700; color: #1e293b;">🎉 Welcome Aboard!</h3>
+                            <p style="margin: 0; font-size: 15px; color: #475569; line-height: 1.6;">Your dedication to mental health care is invaluable to us. Join thousands of licensed professionals transforming mental wellness, one session at a time.</p>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Verification Details Title -->
+                <h3 style="margin: 0 0 20px 0; font-size: 16px; font-weight: 700; color: #1e293b;">✓ Verification Details</h3>
+                
+                <!-- Verification Grid (2 columns) -->
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 32px;">
+                    <!-- Row 1 -->
+                    <tr>
+                        <!-- Box 1 -->
+                        <td style="padding: 0 8px 16px 0; vertical-align: top;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                <tr>
+                                    <td style="padding: 20px; text-align: center;">
+                                        <div style="font-size: 32px; margin-bottom: 12px;">📋</div>
+                                        <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #1e293b;">License Document</p>
+                                        <p style="margin: 0; font-size: 12px; font-weight: 600; color: #10b981;">✓ Verified</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        
+                        <!-- Box 2 -->
+                        <td style="padding: 0 0 16px 8px; vertical-align: top;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                <tr>
+                                    <td style="padding: 20px; text-align: center;">
+                                        <div style="font-size: 32px; margin-bottom: 12px;">🎓</div>
+                                        <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #1e293b;">Degree Certificate</p>
+                                        <p style="margin: 0; font-size: 12px; font-weight: 600; color: #10b981;">✓ Verified</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Row 2 -->
+                    <tr>
+                        <!-- Box 3 -->
+                        <td style="padding: 0 8px 0 0; vertical-align: top;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                <tr>
+                                    <td style="padding: 20px; text-align: center;">
+                                        <div style="font-size: 32px; margin-bottom: 12px;">🆔</div>
+                                        <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #1e293b;">Identity Proof</p>
+                                        <p style="margin: 0; font-size: 12px; font-weight: 600; color: #10b981;">✓ Verified</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        
+                        <!-- Box 4 -->
+                        <td style="padding: 0 0 0 8px; vertical-align: top;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                <tr>
+                                    <td style="padding: 20px; text-align: center;">
+                                        <div style="font-size: 32px; margin-bottom: 12px;">🏅</div>
+                                        <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #1e293b;">Certifications</p>
+                                        <p style="margin: 0; font-size: 12px; font-weight: 600; color: #10b981;">✓ Verified</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Next Steps Title -->
+                <h3 style="margin: 0 0 20px 0; font-size: 16px; font-weight: 700; color: #1e293b;">📋 Next Steps</h3>
+                
+                <!-- Next Steps List -->
+                <table width="100%" cellpadding="3" cellspacing="5" border="0" style="margin-bottom: 32px;">
+                    <!-- Step 1 -->
+                    <tr>
+                        <td style="padding: 16px; margin-bottom: 12px; background-color: #f8fafc; border-left: 3px solid #4f46e5; border-radius: 6px; margin-bottom: 12px;">
+                            <p style="margin: 0 0 6px 0; font-size: 14px; font-weight: 600; color: #1e293b;">Complete Your Profile</p>
+                            <p style="margin: 0; font-size: 14px; color: #475569; line-height: 1.6;">Add your bio, specialties, experience, and therapeutic approach to showcase your expertise.</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Step 2 -->
+                    <tr>
+                        <td style="padding: 16px; margin-bottom: 12px; background-color: #f8fafc; border-left: 3px solid #7c3aed; border-radius: 6px; margin-bottom: 12px;">
+                            <p style="margin: 0 0 6px 0; font-size: 14px; font-weight: 600; color: #1e293b;">Set Your Schedule</p>
+                            <p style="margin: 0; font-size: 14px; color: #475569; line-height: 1.6;">Define your working hours, session availability, and pricing to get started with clients.</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Step 3 -->
+                    <tr>
+                        <td style="padding: 16px; margin-bottom: 12px; background-color: #f8fafc; border-left: 3px solid #6366f1; border-radius: 6px; margin-bottom: 12px;">
+                            <p style="margin: 0 0 6px 0; font-size: 14px; font-weight: 600; color: #1e293b;">Start Accepting Clients</p>
+                            <p style="margin: 0; font-size: 14px; color: #475569; line-height: 1.6;">Begin helping clients on their mental wellness journey and build a thriving practice.</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Step 4 -->
+                    <tr>
+                        <td style="padding: 16px; background-color: #f8fafc; border-left: 3px solid #8b5cf6; border-radius: 6px;">
+                            <p style="margin: 0 0 6px 0; font-size: 14px; font-weight: 600; color: #1e293b;">Access Resources</p>
+                            <p style="margin: 0; font-size: 14px; color: #475569; line-height: 1.6;">Explore our comprehensive therapist tools, training materials, and support resources.</p>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- CTA Button -->
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 32px 0;">
+                    <tr>
+                        <td style="text-align: center;">
+                            <a href="{{ site_url }}/login/" style="display: inline-block; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; padding: 10px 25px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 15px;">
+                                 Login to Your Account
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+                
+            </td>
+        </tr>
+        
+        <!-- Footer -->
+        <tr>
+            <td style="background-color: #f8fafc; padding: 36px 40px; text-align: center; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 13px;">
+                
+                <p style="margin: 0 0 8px 0; font-weight: 700; color: #1e293b; font-size: 14px;">MindEase - Mental Wellness Platform</p>
+                <p style="margin: 0 0 16px 0; font-size: 13px; color: #64748b;">Transforming mental health care, one session at a time</p>
+                
+                <p style="margin: 0; font-size: 12px; color: #94a3b8;">© 2024 MindEase. All rights reserved.</p>
+                
+            </td>
+        </tr>
+        
+    </table>
+
+</body>
+</html> 

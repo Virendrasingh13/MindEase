@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your MindEase Account</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f8fafc;
+            line-height: 1.6;
+            color: #475569;
+        }
+        
+        .email-wrapper {
+            background-color: #f8fafc;
+            padding: 20px;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 50%, #a855f7 100%);
+            padding: 50px 30px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+            .header-icon {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 80px;
+                height: 80px;
+                background: transparent;
+                border-radius: 20px;
+                margin-bottom: 20px;
+                backdrop-filter: blur(10px);
+                border: 2px solid transparent;
+            }
+        
+        .header h1 {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.95;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        .content {
+            padding: 48px 40px;
+        }
+        
+        .greeting {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 16px;
+        }
+        
+        .message {
+            font-size: 15px;
+            color: #475569;
+            line-height: 1.8;
+            margin-bottom: 32px;
+        }
+        
+        .verification-card {
+            background: linear-gradient(135deg, #f3e8ff 0%, #fce7f3 100%);
+            border: 2px solid #e9d5ff;
+            border-radius: 16px;
+            padding: 40px 30px;
+            text-align: center;
+            margin: 40px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .verification-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 200px;
+            height: 200px;
+            background: rgba(168, 85, 247, 0.1);
+            border-radius: 50%;
+        }
+        
+        .verification-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #7c3aed;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            color: white;
+            padding: 16px 48px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
+            margin-bottom: 20px;
+            display: inline-block;
+            position: relative;
+            z-index: 1;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(124, 58, 237, 0.5);
+        }
+        
+        .alternative-section {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .alternative-label {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+        
+        .alternative-link {
+            font-size: 12px;
+            color: #7c3aed;
+            text-decoration: none;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            background-color: rgba(124, 58, 237, 0.1);
+            padding: 10px 12px;
+            border-radius: 8px;
+            display: inline-block;
+            max-width: 100%;
+            line-height: 1.6;
+        }
+        
+        .expires-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #fef08a 0%, #fde047 100%);
+            border: 1px solid #facc15;
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin: 0px 0;
+            font-size: 14px;
+            color: #713f12;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(250, 204, 21, 0.2);
+        }
+        
+        .expires-badge strong {
+            color: #78350f;
+        }
+        
+        .features {
+            margin: 40px 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+        }
+        
+        .feature-item {
+            text-align: center;
+            padding: 20px 16px;
+            margin-top:2px;
+            margin-bottom:2px;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .feature-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+        
+        .feature-text {
+            font-size: 13px;
+            color: #374151;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+        
+        .security-notice {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-left: 4px solid #0284c7;
+            padding: 18px 20px;
+            border-radius: 8px;
+            margin: 32px 0;
+            font-size: 13px;
+            color: #0c4a6e;
+            line-height: 1.8;
+        }
+        
+        .security-notice strong {
+            color: #075985;
+            font-weight: 700;
+        }
+        
+        .divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #e5e7eb, transparent);
+            margin: 32px 0;
+        }
+        
+        .additional-message {
+            background-color: #f9fafb;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 24px 0;
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.8;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .additional-message strong {
+            color: #1f2937;
+        }
+
+        /* Counsellor specific styles */
+        .counsellor-notice {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-left: 4px solid #10b981;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 24px 0;
+            font-size: 14px;
+            color: #065f46;
+            line-height: 1.7;
+        }
+
+        .counsellor-notice strong {
+            color: #047857;
+            font-weight: 700;
+        }
+
+        .verification-steps {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 1px solid #f59e0b;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .verification-steps-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .step-item {
+            display: flex;
+            margin-top:2px;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #92400e;
+        }
+
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: #d97706;
+            color: white;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 12px;
+            flex-shrink: 0;
+            padding-top:5px;
+            padding-left:8px;
+            padding-bottom:1px;
+            line-height: 1; 
+            text-align: center;
+        }
+        
+        .footer-section {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            padding: 32px 40px;
+            border-top: 1px solid #d1d5db;
+            font-size: 13px;
+            color: #6b7280;
+            text-align: center;
+        }
+        
+        .footer-message {
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+        
+        .footer-tagline {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 8px;
+        }
+        
+        .copyright {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #d1d5db;
+            font-size: 11px;
+            color: #9ca3af;
+        }
+        .header-icon-emoji{
+            font-size:70px;
+        }
+        
+        @media (max-width: 600px) {
+            .email-wrapper {
+                padding: 10px;
+            }
+            
+            .email-container {
+                border-radius: 12px;
+            }
+            
+            .header {
+                padding: 40px 24px;
+            }
+            
+            .header h1 {
+                font-size: 28px;
+            }
+            
+            .header p {
+                font-size: 14px;
+            }
+            
+            .header-icon {
+                font-size:60px;
+            }
+
+            .header-icon-emoji{
+                font-size:60px;
+            }   
+            
+            .header-icon svg {
+                width: 42px;
+                height: 42px;
+            }
+            
+            .content {
+                padding: 32px 24px;
+            }
+            
+            .greeting {
+                font-size: 18px;
+            }
+            
+            .message {
+                font-size: 14px;
+            }
+            
+            .verification-card {
+                padding: 32px 24px;
+            }
+            
+            .cta-button {
+                padding: 14px 40px;
+                font-size: 15px;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .footer-section {
+                padding: 24px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <div class="email-container">
+            <!-- Header with Enhanced Design -->
+            <div class="header">
+                <div class="header-content">
+                    <div class="header-icon">
+                        <span class="header-icon-emoji" style="">🧠</span>
+                    </div>
+                    <h1>MindEase</h1>
+                    <p>Verify Your Account</p>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="content">
+                <!-- Greeting -->
+                <div class="greeting">
+                    {% if user.role == 'counsellor' %}
+                    Welcome to MindEase, Future Therapist! 🎉
+                    {% else %}
+                    Welcome to MindEase! 🎉
+                    {% endif %}
+                </div>
+                
+                <!-- Message -->
+                <div class="message">
+                    {% if user.role == 'counsellor' %}
+                    Thank you for registering as a counsellor with MindEase! We're excited to have you join our community of mental health professionals. Please verify your email address to proceed with your background verification process.
+                    {% else %}
+                    Thank you for signing up! We're thrilled to have you join our community of individuals committed to better mental wellness. To get started, please verify your email address by clicking the button below.
+                    {% endif %}
+                </div>
+
+                <!-- Counsellor Specific Information -->
+                {% if user.role == 'counsellor' %}
+                <div class="counsellor-notice">
+                    <strong>🔒 Professional Verification Process</strong><br>
+                    After email verification, your account will undergo background verification. This includes reviewing your professional licenses, degrees, and certifications. You'll receive approval notification within 2-3 business days.
+                </div>
+
+                <div class="verification-steps">
+                    <div class="verification-steps-title">📋 Verification Steps</div>
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div>Email Verification (Current Step)</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div>Background Document Review</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div>Professional License Validation</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <div>Account Activation & Approval</div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Verification Card -->
+                <div class="verification-card">
+                    <div class="verification-title">Verify Your Email</div>
+                    <a href="{{ verification_url }}" class="cta-button" style="color:white;">Verify Email Address</a>
+                    
+                    <div class="alternative-section">
+                        <div class="alternative-label">Or copy and paste this link:</div>
+                        <div class="alternative-link">{{ verification_url }}</div>
+                    </div>
+                </div>
+                
+                <!-- Expires Badge -->
+                <div class="expires-badge">
+                    ⏱️ <strong>Expires in 24 hours</strong> — Verify your email to activate your account
+                </div>
+                
+                <!-- Features -->
+                <div class="features">
+                    {% if user.role == 'counsellor' %}
+                    <div class="feature-item">
+                        <div class="feature-icon">👥</div>
+                        <div class="feature-text">Join 500+ Professional Therapists</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">💼</div>
+                        <div class="feature-text">Build Your Professional Practice</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-text">Reach Clients Seeking Help</div>
+                    </div>
+                    {% else %}
+                    <div class="feature-item">
+                        <div class="feature-icon">👥</div>
+                        <div class="feature-text">Connect with 150+ Expert Therapists</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">📚</div>
+                        <div class="feature-text">Access 500+ Wellness Resources</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-text">Get Personalized Support</div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Security Notice -->
+                <div class="security-notice">
+                    🔒 <strong>Security Tip:</strong> We'll never ask for your password via email. Keep this verification link private and don't share it with anyone.
+                </div>
+                
+                <!-- Divider -->
+                <div class="divider"></div>
+                
+                <!-- Additional Message -->
+                <div class="additional-message">
+                    <strong>Didn't create this account?</strong><br>
+                    If you didn't sign up for MindEase, please disregard this email. Your account will not be activated without your confirmation.
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="footer-section">
+                <div class="footer-message">
+                    Made with ❤️ by the MindEase Team
+                </div>
+                <div class="footer-tagline">
+                    {% if user.role == 'counsellor' %}
+                    Supporting mental health professionals in delivering quality care
+                    {% else %}
+                    Empowering your journey to better mental health
+                    {% endif %}
+                </div>
+                <div class="copyright">
+                    © 2025 MindEase. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
