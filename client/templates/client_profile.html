@@ -1,0 +1,717 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - MindEase{% endblock %}
+
+{% block extra_css %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #06b6d4;
+            --accent: #8b5cf6;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --text: #475569;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            overflow-x: hidden;
+        }
+        
+        .nav-blur {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .animate-slide-up {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideUp 0.6s ease forwards;
+        }
+        
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in {
+            opacity: 0;
+            animation: fadeIn 0.8s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        .input-focus:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        .profile-picture-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .profile-picture-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            border: 3px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        
+        .profile-picture-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .profile-picture-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #94a3b8;
+        }
+        
+        .profile-picture-placeholder i {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .profile-upload-btn {
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .profile-upload-btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .specialty-tag {
+            display: inline-block;
+            background-color: #e0e7ff;
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <!-- Main Content -->
+    <div class="pt-16">
+        <!-- Main Content Area -->
+        <main class="overflow-y-auto custom-scrollbar py-8 bg-slate-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Header Section -->
+                <div class="mb-8 animate-slide-up">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h1 class="text-2xl md:text-3xl font-bold text-slate-900">My Profile</h1>
+                            <p class="text-slate-600 mt-1">Manage your personal information and account settings</p>
+                        </div>
+                        <div class="mt-4 md:mt-0">
+                            <button id="edit-profile-btn" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg inline-flex items-center">
+                                <i class="fas fa-edit mr-2"></i> Edit Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Left Column - Profile Picture & Quick Info -->
+                    <div class="lg:col-span-1">
+                        <!-- Profile Picture Card -->
+                        <div class="bg-white rounded-xl shadow-sm overflow-hidden animate-slide-up">
+                            <div class="p-6">
+                                <!-- Profile Picture -->
+                                <div class="profile-picture-container">
+                                    <div class="profile-picture-preview" id="profile-picture-preview">
+                                        {% if user.profile_picture %}
+                                            <img src="{{ user.profile_picture.url }}" alt="Profile Picture">
+                                        {% else %}
+                                            <div class="profile-picture-placeholder">
+                                                <i class="fas fa-user-circle"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <input type="file" id="profile-picture" class="hidden" accept="image/*">
+                                    <button type="button" class="profile-upload-btn" id="profile-upload-btn">
+                                        <i class="fas fa-camera mr-2"></i> Upload Photo
+                                    </button>
+                                </div>
+                                
+                                <!-- Quick Stats -->
+                                <div class="space-y-4 mt-6">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-slate-600">Member Since</span>
+                                        <span class="font-medium text-slate-900">{{ member_since|date:"M Y" }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-slate-600">Total Sessions</span>
+                                        <span class="font-medium text-slate-900">{{ total_sessions }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-slate-600">Last Session</span>
+                                        <span class="font-medium text-slate-900">{% if last_session_date %}{{ last_session_date|date:"M d, Y" }}{% else %}—{% endif %}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-slate-600">Next Session</span>
+                                        <span class="font-medium text-slate-900">{% if next_session %}{{ next_session.session_date|date:"M d, Y" }} {{ next_session.session_time|time:"H:i" }}{% else %}—{% endif %}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column - Profile Details Form -->
+                    <div class="lg:col-span-2">
+                        <!-- Personal Information -->
+                        <div class="bg-white rounded-xl shadow-sm overflow-hidden animate-slide-up">
+                            <div class="px-6 py-4 border-b border-slate-200">
+                                <h2 class="text-lg font-semibold text-slate-900">Personal Information</h2>
+                            </div>
+                            <div class="p-6">
+                                <form id="profile-form" method="post" action="{% url 'client_profile' %}" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <!-- First Name -->
+                                        <div>
+                                            <label for="first-name" class="block text-sm font-medium text-slate-700 mb-2">First Name</label>
+                                            <input type="text" id="first-name" name="first_name" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus transition-all bg-slate-50" value="{{ user.first_name }}" disabled>
+                                        </div>
+                                        
+                                        <!-- Last Name -->
+                                        <div>
+                                            <label for="last-name" class="block text-sm font-medium text-slate-700 mb-2">Last Name</label>
+                                            <input type="text" id="last-name" name="last_name" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus transition-all bg-slate-50" value="{{ user.last_name }}" disabled>
+                                        </div>
+                                        
+                                        <!-- Email - Now Editable -->
+                                        <div class="md:col-span-2">
+                                            <label for="email" class="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
+                                            <input type="email" id="email" name="email" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus transition-all bg-slate-50" value="{{ user.email }}" disabled>
+                                        </div>
+                                        
+                                        <!-- Phone -->
+                                        <div class="md:col-span-2">
+                                            <label for="phone" class="block text-sm font-medium text-slate-700 mb-2">Phone Number</label>
+                                            <input type="tel" id="phone" name="phone" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus transition-all bg-slate-50" value="{{ user.phone }}" disabled>
+                                        </div>
+                                        
+                                        <!-- Date of Birth - Always Disabled -->
+                                        <div>
+                                            <label for="dob" class="block text-sm font-medium text-slate-700 mb-2">Date of Birth</label>
+                                            <div class="relative">
+                                                <input type="date" id="dob" name="dob" class="w-full px-4 py-3 border border-slate-300 rounded-lg bg-slate-100 text-slate-500" value="{{ client.date_of_birth|date:'Y-m-d' }}" disabled readonly>
+                                                <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                                                    <i class="fas fa-lock text-slate-400"></i>
+                                                </div>
+                                            </div>
+                                            <p class="text-xs text-slate-500 mt-1">Date of birth cannot be changed</p>
+                                        </div>
+                                        
+                                        <!-- Gender -->
+                                        <div>
+                                            <label for="gender" class="block text-sm font-medium text-slate-700 mb-2">Gender</label>
+                                            <select id="gender" name="gender" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus transition-all bg-slate-50" disabled>
+                                                <option value="male" {% if user.gender == 'male' %}selected{% endif %}>Male</option>
+                                                <option value="female" {% if user.gender == 'female' %}selected{% endif %}>Female</option>
+                                                <option value="other" {% if user.gender == 'other' %}selected{% endif %}>Other</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Primary Concern -->
+                                        <div class="md:col-span-2">
+                                            <label for="primary-concern" class="block text-sm font-medium text-slate-700 mb-2">Primary Concern</label>
+                                            <select id="primary-concern" name="primary_concern" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus transition-all bg-slate-50" disabled>
+                                                <option value="anxiety" {% if client.primary_concern == 'anxiety' %}selected{% endif %}>Anxiety & Stress</option>
+                                                <option value="depression" {% if client.primary_concern == 'depression' %}selected{% endif %}>Depression</option>
+                                                <option value="relationship" {% if client.primary_concern == 'relationship' %}selected{% endif %}>Relationship Issues</option>
+                                                <option value="trauma" {% if client.primary_concern == 'trauma' %}selected{% endif %}>Trauma & PTSD</option>
+                                                <option value="self_improvement" {% if client.primary_concern == 'self_improvement' %}selected{% endif %}>Self-Improvement</option>
+                                                <option value="other" {% if client.primary_concern == 'other' %}selected{% endif %}>Other</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Bio -->
+                                        <div class="md:col-span-2">
+                                            <label for="bio" class="block text-sm font-medium text-slate-700 mb-2">About Me</label>
+                                            <textarea id="bio" name="about_me" rows="4" class="w-full px-4 py-3 border border-slate-300 rounded-lg input-focus transition-all bg-slate-50 resize-none" disabled>{{ client.about_me }}</textarea>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons (Visible only in edit mode) -->
+                        <div id="action-buttons" class="hidden mt-8 flex justify-end space-x-4 animate-slide-up">
+                            <button id="cancel-edit-btn" class="bg-white border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-medium hover:bg-slate-50 transition-colors">
+                                Cancel
+                            </button>
+                            <button id="save-profile-btn" type="submit" form="profile-form" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg inline-flex items-center">
+                                <i class="fas fa-save mr-2"></i> Save Changes
+                            </button>
+                        </div>
+                        
+                        <!-- Account Settings -->
+                        <!-- <div class="bg-white rounded-xl shadow-sm overflow-hidden mt-8 animate-slide-up">
+                            <div class="px-6 py-4 border-b border-slate-200">
+                                <h2 class="text-lg font-semibold text-slate-900">Account Settings</h2>
+                            </div>
+                            <div class="p-6">
+                                <div class="space-y-6">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <h3 class="font-medium text-slate-800">Change Password</h3>
+                                            <p class="text-slate-600 text-sm mt-1">Update your password to keep your account secure</p>
+                                        </div>
+                                        <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">
+                                            Change Password
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Profile Updated Success Modal -->
+    <div id="success-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="p-6 text-center">
+                <div class="flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mx-auto mb-4">
+                    <i class="fas fa-check text-green-600 text-2xl"></i>
+                </div>
+                
+                <h3 class="text-xl font-bold text-slate-800 text-center mb-2">Profile Updated Successfully!</h3>
+                <p class="text-slate-600 text-center mb-6">Your profile information has been saved and updated across the MindEase platform.</p>
+                
+                <div class="flex space-x-4">
+                    <button id="close-success-modal" class="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors">
+                        Continue
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block extra_js %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Display Django messages
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == 'success' %}
+                        showNotification('{{ message }}');
+                        // Show success modal for profile updates
+                        const successModal = document.getElementById('success-modal');
+                        if (successModal) {
+                            successModal.classList.add('active');
+                        }
+                    {% elif message.tags == 'error' %}
+                        alert('Error: {{ message }}');
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            
+            // User menu toggle
+            const userMenuButton = document.getElementById('user-menu-button');
+            const userMenu = document.getElementById('user-menu');
+            
+            userMenuButton.addEventListener('click', function() {
+                userMenu.classList.toggle('hidden');
+            });
+            
+            // Close user menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                    userMenu.classList.add('hidden');
+                }
+            });
+            
+            // Navbar background on scroll
+            const nav = document.querySelector('nav');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    nav.classList.add('shadow-lg');
+                    nav.classList.remove('shadow-sm');
+                } else {
+                    nav.classList.remove('shadow-lg');
+                    nav.classList.add('shadow-sm');
+                }
+            });
+            
+            // Logout functionality
+            const logoutModal = document.getElementById('logout-modal');
+            const logoutBtns = document.querySelectorAll('.logout-btn');
+            const cancelLogout = document.getElementById('cancel-logout');
+            const confirmLogout = document.getElementById('confirm-logout');
+
+            // Open logout modal
+            logoutBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    logoutModal.classList.add('active');
+                });
+            });
+
+            // Close logout modal
+            cancelLogout.addEventListener('click', function() {
+                logoutModal.classList.remove('active');
+            });
+
+            // Confirm logout
+            confirmLogout.addEventListener('click', function() {
+                // Show logout success message
+                showNotification('You have been logged out successfully!');
+                
+                // Close modal
+                logoutModal.classList.remove('active');
+                
+                // Redirect to login page after a short delay
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1000);
+            });
+
+            // Close modal when clicking outside
+            logoutModal.addEventListener('click', function(e) {
+                if (e.target === logoutModal) {
+                    logoutModal.classList.remove('active');
+                }
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && logoutModal.classList.contains('active')) {
+                    logoutModal.classList.remove('active');
+                }
+            });
+            
+            // Profile Picture Upload
+            const profilePictureInput = document.getElementById('profile-picture');
+            const profilePicturePreview = document.getElementById('profile-picture-preview');
+            const profileUploadBtn = document.getElementById('profile-upload-btn');
+            
+            profileUploadBtn.addEventListener('click', function() {
+                profilePictureInput.click();
+            });
+            
+            profilePictureInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    
+                    // Validate file type
+                    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                    if (!validTypes.includes(file.type)) {
+                        alert('Please select a valid image file (JPEG, PNG, or GIF)');
+                        this.value = '';
+                        return;
+                    }
+                    
+                    // Validate file size (5MB max)
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('File size must be less than 5MB');
+                        this.value = '';
+                        return;
+                    }
+                    
+                    // Show preview immediately
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        profilePicturePreview.innerHTML = `<img src="${e.target.result}" alt="Profile Picture">`;
+                    }
+                    reader.readAsDataURL(file);
+                    
+                    // Upload via AJAX
+                    const formData = new FormData();
+                    formData.append('profile_picture', file);
+                    formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+                    
+                    // Show uploading message
+                    showNotification('Uploading profile picture...');
+                    
+                    fetch('{% url "upload_profile_picture" %}', {
+                        method: 'POST',
+                        body: formData,
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification('Profile picture uploaded successfully!');
+                        } else {
+                            alert('Error: ' + data.error);
+                            // Revert preview on error
+                            {% if user.profile_picture %}
+                                profilePicturePreview.innerHTML = `<img src="{{ user.profile_picture.url }}" alt="Profile Picture">`;
+                            {% else %}
+                                profilePicturePreview.innerHTML = `<div class="profile-picture-placeholder"><i class="fas fa-user-circle"></i></div>`;
+                            {% endif %}
+                        }
+                    })
+                    .catch(error => {
+                        alert('Error uploading profile picture');
+                        console.error('Error:', error);
+                        // Revert preview on error
+                        {% if user.profile_picture %}
+                            profilePicturePreview.innerHTML = `<img src="{{ user.profile_picture.url }}" alt="Profile Picture">`;
+                        {% else %}
+                            profilePicturePreview.innerHTML = `<div class="profile-picture-placeholder"><i class="fas fa-user-circle"></i></div>`;
+                        {% endif %}
+                    });
+                }
+            });
+            
+            // Edit Profile Functionality
+            const editProfileBtn = document.getElementById('edit-profile-btn');
+            const cancelEditBtn = document.getElementById('cancel-edit-btn');
+            const saveProfileBtn = document.getElementById('save-profile-btn');
+            const actionButtons = document.getElementById('action-buttons');
+            const successModal = document.getElementById('success-modal');
+            const closeSuccessModal = document.getElementById('close-success-modal');
+            
+            // Editable fields (including email, excluding date of birth)
+            const editableFields = [
+                document.getElementById('first-name'),
+                document.getElementById('last-name'),
+                document.getElementById('email'),
+                document.getElementById('phone'),
+                document.getElementById('gender'),
+                document.getElementById('primary-concern'),
+                document.getElementById('bio')
+            ];
+            
+            let isEditMode = false;
+            
+            // Toggle edit mode
+            editProfileBtn.addEventListener('click', function() {
+                isEditMode = !isEditMode;
+                
+                if (isEditMode) {
+                    // Enable all editable form fields
+                    editableFields.forEach(field => {
+                        field.disabled = false;
+                        field.classList.remove('bg-slate-50');
+                    });
+                    
+                    // Change button text
+                    editProfileBtn.innerHTML = '<i class="fas fa-times mr-2"></i> Cancel Edit';
+                    editProfileBtn.classList.remove('bg-indigo-600');
+                    editProfileBtn.classList.add('bg-slate-600');
+                    
+                    // Show action buttons
+                    actionButtons.classList.remove('hidden');
+                } else {
+                    // Disable all form fields
+                    editableFields.forEach(field => {
+                        field.disabled = true;
+                        field.classList.add('bg-slate-50');
+                    });
+                    
+                    // Change button text back
+                    editProfileBtn.innerHTML = '<i class="fas fa-edit mr-2"></i> Edit Profile';
+                    editProfileBtn.classList.remove('bg-slate-600');
+                    editProfileBtn.classList.add('bg-indigo-600');
+                    
+                    // Hide action buttons
+                    actionButtons.classList.add('hidden');
+                }
+            });
+            
+            // Cancel edit
+            cancelEditBtn.addEventListener('click', function() {
+                // Trigger the edit button click to toggle back to view mode
+                editProfileBtn.click();
+            });
+            
+            // Save profile: submit the form
+            saveProfileBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Get the form
+                const form = document.getElementById('profile-form');
+                const formData = new FormData(form);
+                
+                // Add profile picture if selected
+                const profilePicture = document.getElementById('profile-picture').files[0];
+                if (profilePicture) {
+                    formData.append('profile_picture', profilePicture);
+                }
+                
+                // Submit the form
+                form.submit();
+            });
+            
+            // Close success modal
+            closeSuccessModal.addEventListener('click', function() {
+                successModal.classList.remove('active');
+            });
+            
+            // Close success modal when clicking outside
+            successModal.addEventListener('click', function(e) {
+                if (e.target === successModal) {
+                    successModal.classList.remove('active');
+                }
+            });
+            
+            // Close success modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && successModal.classList.contains('active')) {
+                    successModal.classList.remove('active');
+                }
+            });
+            
+            // Animation on scroll
+            const animatedElements = document.querySelectorAll('.animate-slide-up, .animate-fade-in');
+            
+            const animateOnScroll = function() {
+                animatedElements.forEach(element => {
+                    const elementTop = element.getBoundingClientRect().top;
+                    const elementVisible = 150;
+                    
+                    if (elementTop < window.innerHeight - elementVisible) {
+                        element.classList.add('visible');
+                    }
+                });
+            };
+            
+            // Initial check
+            animateOnScroll();
+            
+            // Check on scroll
+            window.addEventListener('scroll', animateOnScroll);
+        });
+        
+        // Show notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-slide-up';
+            notification.innerHTML = `<i class="fas fa-check-circle mr-2"></i> ${message}`;
+            document.body.appendChild(notification);
+            
+            // Remove notification after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    </script>
+{% endblock %}

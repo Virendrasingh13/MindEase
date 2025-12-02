@@ -1,0 +1,542 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - MindEase Client{% endblock %}
+
+{% block extra_css %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #06b6d4;
+            --accent: #8b5cf6;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --text: #475569;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            overflow-x: hidden;
+        }
+        
+        .nav-blur {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .animate-slide-up {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideUp 0.6s ease forwards;
+        }
+        
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in {
+            opacity: 0;
+            animation: fadeIn 0.8s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .appointment-card {
+            transition: all 0.3s ease;
+        }
+        
+        .appointment-card:hover {
+            transform: translateX(5px);
+        }
+        
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <!-- Logout Confirmation Modal -->
+    <div id="logout-modal" class="logout-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden transition-opacity duration-300">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 animate-slide-up transform transition-transform duration-300">
+            <div class="flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mx-auto mb-4">
+                <i class="fas fa-sign-out-alt text-red-600 text-2xl"></i>
+            </div>
+            
+            <h3 class="text-xl font-bold text-slate-800 text-center mb-2">Confirm Logout</h3>
+            <p class="text-slate-600 text-center mb-6">Are you sure you want to logout from your account?</p>
+            
+            <div class="flex space-x-4">
+                <button id="cancel-logout" class="flex-1 bg-slate-200 text-slate-700 px-6 py-3 rounded-lg font-medium hover:bg-slate-300 transition-colors">
+                    Cancel
+                </button>
+                <button id="confirm-logout" class="flex-1 bg-red-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-red-700 transition-colors">
+                    Yes, Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="pt-16">
+        <!-- Main Content Area -->
+        <main class="overflow-y-auto custom-scrollbar py-8 bg-slate-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Welcome Section -->
+                <div class="mb-8 animate-slide-up">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h1 class="text-2xl md:text-3xl font-bold text-slate-900">
+                                Welcome back, {{ client.user.first_name|default:user.first_name|default:user.username }}!
+                            </h1>
+                            <p class="text-slate-600 mt-1">Here’s the latest snapshot of your therapy journey.</p>
+                        </div>
+                        <div class="mt-4 md:mt-0">
+                            <a href="{% url 'therapists' %}" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg inline-flex items-center">
+                                <i class="fas fa-plus mr-2"></i> Book New Session
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <!-- Total Sessions Card -->
+                    <div class="bg-white rounded-xl p-6 shadow-sm stat-card animate-slide-up">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600">
+                                <i class="fas fa-calendar-check text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-slate-600">Total Sessions</p>
+                                <p class="text-2xl font-bold text-slate-900">{{ total_sessions }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Next Session Card -->
+                    <div class="bg-white rounded-xl p-6 shadow-sm stat-card animate-slide-up" style="animation-delay: 0.1s;">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center text-cyan-600">
+                                <i class="fas fa-clock text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-slate-600">Next Session</p>
+                                {% if next_session %}
+                                <p class="text-lg font-bold text-slate-900">
+                                    {{ next_session.session_date|date:"l, M j" }},
+                                    {{ next_session.session_time|time:"g:i A" }}
+                                </p>
+                                {% else %}
+                                <p class="text-lg font-bold text-slate-900">No upcoming sessions</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if next_session %}
+                        <div class="mt-4">
+                            <div class="flex items-center text-sm text-slate-500">
+                                <i class="fas fa-user-md text-indigo-500 mr-1"></i>
+                                <span>With {{ next_session.counsellor.user.get_full_name }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Left Column -->
+                    <div class="lg:col-span-2 space-y-8">
+                        <!-- Upcoming Appointments -->
+                        <div class="bg-white rounded-xl shadow-sm overflow-hidden animate-slide-up">
+                            <div class="px-6 py-4 border-b border-slate-200">
+                                <h2 class="text-lg font-semibold text-slate-900">Upcoming Appointments</h2>
+                            </div>
+                            <div class="divide-y divide-slate-200">
+                                {% if upcoming_appointments %}
+                                    {% for appointment in upcoming_appointments %}
+                                    <div class="p-6 appointment-card hover:bg-slate-50 cursor-pointer">
+                                        <div class="flex items-start">
+                                            <div class="flex-shrink-0 w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 font-semibold">
+                                                {{ appointment.counsellor.user.first_name|first }}{{ appointment.counsellor.user.last_name|first }}
+                                            </div>
+                                            <div class="ml-4 flex-1">
+                                                <div class="flex items-center justify-between">
+                                                    <h3 class="font-medium text-slate-900">
+                                                        Session with {{ appointment.counsellor.user.get_full_name }}
+                                                    </h3>
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                        {% if appointment.status == 'confirmed' %}
+                                                            bg-green-100 text-green-800
+                                                        {% elif appointment.status == 'pending' %}
+                                                            bg-yellow-100 text-yellow-800
+                                                        {% else %}
+                                                            bg-blue-100 text-blue-800
+                                                        {% endif %}
+                                                    ">
+                                                        {{ appointment.get_status_display }}
+                                                    </span>
+                                                </div>
+                                                <p class="text-sm text-slate-600 mt-1">
+                                                    {{ appointment.session_duration }} min • ₹{{ appointment.session_fee }}
+                                                </p>
+                                                <div class="mt-2 flex items-center text-sm text-slate-500">
+                                                    <i class="fas fa-calendar mr-1.5"></i>
+                                                    <span>
+                                                        {{ appointment.session_date|date:"l, F j" }} • {{ appointment.session_time|time:"g:i A" }}
+                                                    </span>
+                                                </div>
+                                                {% if appointment.google_meet_link %}
+                                                <div class="mt-1 flex items-center text-sm text-slate-500">
+                                                    <i class="fas fa-video mr-1.5"></i>
+                                                    <span>Google Meet</span>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 flex flex-wrap gap-3">
+                                            {% if appointment.google_meet_link %}
+                                            <a href="{{ appointment.google_meet_link }}" target="_blank" rel="noopener" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">
+                                                Join Session
+                                            </a>
+                                            {% endif %}
+                                            <button class="bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors" disabled>
+                                                Reschedule (coming soon)
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="p-6 text-center text-slate-500">
+                                        No upcoming appointments yet. Book a session to see it appear here.
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-sm text-slate-500">
+                                <span>Showing {{ upcoming_appointments|length }} of {{ upcoming_count|default:0 }} upcoming sessions</span>
+                                <a href="{% url 'therapists' %}" class="text-indigo-600 hover:text-indigo-500 font-medium inline-flex items-center">
+                                    Browse therapists
+                                    <i class="fas fa-chevron-right ml-1"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Past Appointments -->
+                        <div class="bg-white rounded-xl shadow-sm overflow-hidden animate-slide-up">
+                            <div class="px-6 py-4 border-b border-slate-200">
+                                <h2 class="text-lg font-semibold text-slate-900">Past Appointments</h2>
+                            </div>
+                            <div class="divide-y divide-slate-200">
+                                {% if past_appointments %}
+                                    {% for appointment in past_appointments %}
+                                    <div class="p-6 appointment-card hover:bg-slate-50 cursor-pointer">
+                                        <div class="flex items-start">
+                                            <div class="flex-shrink-0 w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center text-cyan-600 font-semibold">
+                                                {{ appointment.counsellor.user.first_name|first }}{{ appointment.counsellor.user.last_name|first }}
+                                            </div>
+                                            <div class="ml-4 flex-1">
+                                                <div class="flex items-center justify-between">
+                                                    <h3 class="font-medium text-slate-900">
+                                                        Session with {{ appointment.counsellor.user.get_full_name }}
+                                                    </h3>
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                        {% if appointment.status == 'completed' %}
+                                                            bg-slate-100 text-slate-800
+                                                        {% else %}
+                                                            bg-rose-100 text-rose-800
+                                                        {% endif %}
+                                                    ">
+                                                        {{ appointment.get_status_display }}
+                                                    </span>
+                                                </div>
+                                                <p class="text-sm text-slate-600 mt-1">
+                                                    {{ appointment.session_date|date:"F j, Y" }} • {{ appointment.session_time|time:"g:i A" }}
+                                                </p>
+                                                {% if appointment.counsellor_notes %}
+                                                <div class="mt-1 flex items-center text-sm text-slate-500">
+                                                    <i class="fas fa-file-medical-alt mr-1.5"></i>
+                                                    <span>Session notes added</span>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 flex flex-wrap gap-3">
+                                            <button class="bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors" disabled>
+                                                View Notes (coming soon)
+                                            </button>
+                                            <a href="{% url 'therapists' %}" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">
+                                                Book Again
+                                            </a>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="p-6 text-center text-slate-500">
+                                        Your past sessions will show up here once you complete a booking.
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 text-sm text-slate-500">
+                                Completed sessions logged: {{ past_count|default:0 }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column -->
+                    <div class="space-y-8">
+                        <!-- My Therapists -->
+                        <div class="bg-white rounded-xl shadow-sm overflow-hidden animate-slide-up">
+                            <div class="px-6 py-4 border-b border-slate-200">
+                                <h2 class="text-lg font-semibold text-slate-900">My Therapists</h2>
+                            </div>
+                            <div class="p-6">
+                                {% if my_therapists %}
+                                    <div class="space-y-4">
+                                        {% for therapist in my_therapists %}
+                                        <div class="flex items-center p-4 border border-slate-200 rounded-lg hover:border-indigo-300 transition-colors">
+                                            <div class="flex-shrink-0 w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold mr-4">
+                                                {{ therapist.user.first_name|first }}{{ therapist.user.last_name|first }}
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <h3 class="font-medium text-slate-900 truncate">{{ therapist.user.get_full_name }}</h3>
+                                                <p class="text-sm text-slate-600 truncate">
+                                                    {{ therapist.get_license_type_display }}
+                                                </p>
+                                                <div class="flex items-center mt-1">
+                                                    <div class="flex text-amber-400 text-xs">
+                                                        {% for i in '12345'|make_list %}
+                                                            {% if forloop.counter <= therapist.rating %}
+                                                                <i class="fas fa-star"></i>
+                                                            {% else %}
+                                                                <i class="far fa-star"></i>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                    <span class="text-xs text-slate-500 ml-1">{{ therapist.rating|default:'0.0' }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-slate-500 text-sm">You haven't had any sessions yet. Book your first session to build your care team.</p>
+                                {% endif %}
+                                <div class="mt-6">
+                                    <a href="{% url 'therapists' %}" class="bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-slate-50 transition-colors inline-flex items-center">
+                                        <i class="fas fa-search mr-2"></i> Find More Therapists
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Session Summary -->
+                        <div class="bg-white rounded-xl shadow-sm overflow-hidden animate-slide-up">
+                            <div class="px-6 py-4 border-b border-slate-200">
+                                <h2 class="text-lg font-semibold text-slate-900">Session Summary</h2>
+                            </div>
+                            <div class="p-6">
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-slate-600">Completed Sessions</span>
+                                        <span class="font-medium text-slate-900">{{ completed_sessions|default:0 }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-slate-600">Upcoming Sessions</span>
+                                        <span class="font-medium text-slate-900">{{ upcoming_count|default:0 }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-slate-600">Pending Payments</span>
+                                        <span class="font-medium text-slate-900">{{ pending_payments|default:0 }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-slate-600">Total Invested</span>
+                                        <span class="font-medium text-green-600">₹{{ total_spent|default:'0.00' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+{% endblock %}
+    <!-- Footer -->
+{% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // User menu toggle
+            const userMenuButton = document.getElementById('user-menu-button');
+            const userMenu = document.getElementById('user-menu');
+            
+            userMenuButton.addEventListener('click', function() {
+                userMenu.classList.toggle('hidden');
+            });
+            
+            // Close user menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                    userMenu.classList.add('hidden');
+                }
+            });
+            
+            // Navbar background on scroll
+            const nav = document.querySelector('nav');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    nav.classList.add('shadow-lg');
+                    nav.classList.remove('shadow-sm');
+                } else {
+                    nav.classList.remove('shadow-lg');
+                    nav.classList.add('shadow-sm');
+                }
+            });
+            
+            // Logout functionality
+            const logoutModal = document.getElementById('logout-modal');
+            const logoutBtns = document.querySelectorAll('.logout-btn');
+            const cancelLogout = document.getElementById('cancel-logout');
+            const confirmLogout = document.getElementById('confirm-logout');
+
+            // Open logout modal
+            logoutBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    logoutModal.classList.remove('hidden');
+                });
+            });
+
+            // Close logout modal
+            cancelLogout.addEventListener('click', function() {
+                logoutModal.classList.add('hidden');
+            });
+
+            // Confirm logout
+            confirmLogout.addEventListener('click', function() {
+                // Show logout success message
+                showNotification('You have been logged out successfully!');
+                
+                // Close modal
+                logoutModal.classList.add('hidden');
+                
+                // Redirect to login page after a short delay
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1000);
+            });
+
+            // Close modal when clicking outside
+            logoutModal.addEventListener('click', function(e) {
+                if (e.target === logoutModal) {
+                    logoutModal.classList.add('hidden');
+                }
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && !logoutModal.classList.contains('hidden')) {
+                    logoutModal.classList.add('hidden');
+                }
+            });
+            
+            // Appointment card interactions
+            document.querySelectorAll('.appointment-card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    // Don't trigger if clicking on a button
+                    if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                        return;
+                    }
+                    
+                    // In a real app, this would navigate to appointment details
+                    console.log('Viewing appointment details');
+                });
+            });
+            
+            // Animation on scroll
+            const animatedElements = document.querySelectorAll('.animate-slide-up, .animate-fade-in');
+            
+            const animateOnScroll = function() {
+                animatedElements.forEach(element => {
+                    const elementTop = element.getBoundingClientRect().top;
+                    const elementVisible = 150;
+                    
+                    if (elementTop < window.innerHeight - elementVisible) {
+                        element.classList.add('visible');
+                    }
+                });
+            };
+            
+            // Initial check
+            animateOnScroll();
+            
+            // Check on scroll
+            window.addEventListener('scroll', animateOnScroll);
+        });
+        
+        // Show notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-slide-up';
+            notification.innerHTML = `<i class="fas fa-check-circle mr-2"></i> ${message}`;
+            document.body.appendChild(notification);
+            
+            // Remove notification after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    </script>
+{% endblock %}
