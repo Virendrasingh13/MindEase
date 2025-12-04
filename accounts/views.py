@@ -24,6 +24,7 @@ from .models import (
     Language, AgeGroup, Certification, EmailVerification, 
     BackgroundVerification
 )
+from .factories import ClientFactory, CounsellorFactory
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
@@ -177,49 +178,46 @@ def validate_common_data(post_data):
 
 
 def create_client_account(request):
-    """Create a client account"""
+    """Create a client account using Factory Pattern"""
     try:
-        with transaction.atomic():
-            # Validate client-specific data
-            client_errors = validate_client_data(request.POST)
-            if client_errors:
-                return JsonResponse({
-                    'success': False,
-                    'errors': client_errors
-                }, status=400)
-            
-            # Create User
-            user = create_user_from_request(request, 'client')
-            
-            # Create Client profile
-            client = Client.objects.create(
-                user=user,
-                date_of_birth=request.POST.get('date_of_birth'),
-                primary_concern=request.POST.get('primary_concern'),
-                other_primary_concern=request.POST.get('other_primary_concern') or None,
-                about_me=request.POST.get('about_me'),
-                terms_accepted=request.POST.get('terms_accepted') == 'true'
-            )
-            
-            # Handle profile picture
-            if 'profile_picture' in request.FILES:
-                user.profile_picture = request.FILES['profile_picture']
-                user.save()
-            
-            store_registration_email(request, user.email)
-
-            # Send email verification
-            send_verification_email(user)
-            
-            print(f"Client account created successfully: {user.email}")
-            
+        # Validate client-specific data
+        client_errors = validate_client_data(request.POST)
+        if client_errors:
             return JsonResponse({
-                'success': True,
-                'message': 'Client account created successfully. Please check your email for verification.',
-                'role': 'client',
-                'email': user.email
-            })
-            
+                'success': False,
+                'errors': client_errors
+            }, status=400)
+        
+        # Use Factory to create account (handles transaction automatically)
+        factory = ClientFactory()
+        user, client = factory.create_account(
+            username=request.POST.get('email'),  # Email as username
+            email=request.POST.get('email'),
+            password=request.POST.get('password'),
+            first_name=request.POST.get('first_name'),
+            last_name=request.POST.get('last_name'),
+            phone=request.POST.get('phone'),
+            gender=request.POST.get('gender'),
+            date_of_birth=request.POST.get('date_of_birth'),
+            primary_concern=request.POST.get('primary_concern'),
+            other_primary_concern=request.POST.get('other_primary_concern'),
+            about_me=request.POST.get('about_me'),
+            terms_accepted=request.POST.get('terms_accepted') == 'true',
+            profile_picture=request.FILES.get('profile_picture')
+        )
+        
+        store_registration_email(request, user.email)
+        send_verification_email(user)
+        
+        print(f"Client account created successfully: {user.email}")
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Client account created successfully. Please check your email for verification.',
+            'role': 'client',
+            'email': user.email
+        })
+        
     except Exception as e:
         print(f"Error creating client account: {str(e)}")
         return JsonResponse({
@@ -263,51 +261,89 @@ def validate_client_data(post_data):
 
 
 def create_counsellor_account(request):
-    """Create a counsellor account"""
+    """Create a counsellor account using Factory Pattern"""
     try:
-        with transaction.atomic():
-            # Validate counsellor-specific data
-            counsellor_errors = validate_counsellor_data(request.POST)
-            if counsellor_errors:
-                return JsonResponse({
-                    'success': False,
-                    'errors': counsellor_errors
-                }, status=400)
-            
-            # Create User
-            user = create_user_from_request(request, 'counsellor')
-            
-            # Handle profile picture
-            if 'profile_picture' in request.FILES:
-                user.profile_picture = request.FILES['profile_picture']
-                user.save()
-            
-            # Create Counsellor profile
-            counsellor = create_counsellor_profile(user, request)
-            
-            # Create certifications
-            create_counsellor_certifications(counsellor, request)
-            
-            # Create background verification record
-            BackgroundVerification.objects.create(
-                counsellor=counsellor,
-                status='pending'
-            )
-            
-            store_registration_email(request, user.email)
-
-            # Send email verification
-            send_verification_email(user)
-            
-            print(f"Counsellor account created successfully: {user.email}")
-            
+        # Validate counsellor-specific data
+        counsellor_errors = validate_counsellor_data(request.POST)
+        if counsellor_errors:
             return JsonResponse({
-                'success': True,
-                'message': 'Counsellor account created successfully. Please check your email for verification. Your account will be activated after background verification.',
-                'role': 'counsellor',
-                'email': user.email
-            })
+                'success': False,
+                'errors': counsellor_errors
+            }, status=400)
+        
+        # Prepare certifications data
+        certifications = []
+        i = 0
+        while True:
+            cert_name = request.POST.get(f'certification_name_{i}')
+            cert_org = request.POST.get(f'certification_organization_{i}')
+            cert_year = request.POST.get(f'certification_year_{i}')
             
+            if not cert_name or not cert_org or not cert_year:
+                break
+            
+            certifications.append({
+                'name': cert_name,
+                'organization': cert_org,
+                'year_obtained': int(cert_year),
+                'certificate_file': request.FILES.get(f'certification_file_{i}')
+            })
+            i += 1
+        
+        # Use Factory to create account (handles transaction automatically)
+        factory = CounsellorFactory()
+        user, counsellor = factory.create_account(
+            username=request.POST.get('email'),  # Email as username
+            email=request.POST.get('email'),
+            password=request.POST.get('password'),
+            first_name=request.POST.get('first_name'),
+            last_name=request.POST.get('last_name'),
+            phone=request.POST.get('phone'),
+            gender=request.POST.get('gender'),
+            license_number=request.POST.get('license_number'),
+            license_type=request.POST.get('license_type'),
+            other_license_type=request.POST.get('other_license_type'),
+            license_authority=request.POST.get('license_authority'),
+            license_expiry=request.POST.get('license_expiry'),
+            years_experience=int(request.POST.get('years_experience')),
+            highest_degree=request.POST.get('highest_degree'),
+            university=request.POST.get('university'),
+            graduation_year=int(request.POST.get('graduation_year')),
+            session_fee=float(request.POST.get('session_fee')),
+            google_meet_link=request.POST.get('google_meet_link'),
+            professional_experience=request.POST.get('professional_experience'),
+            about_me=request.POST.get('about_me'),
+            license_document=request.FILES.get('license_document'),
+            degree_certificate=request.FILES.get('degree_certificate'),
+            id_proof=request.FILES.get('id_proof'),
+            profile_picture=request.FILES.get('profile_picture'),
+            specializations=request.POST.getlist('specializations'),
+            therapy_approaches=request.POST.getlist('therapy_approaches'),
+            languages=request.POST.getlist('languages'),
+            age_groups=request.POST.getlist('age_groups'),
+            certifications=certifications,
+            terms_accepted=request.POST.get('terms_accepted') == 'true',
+            consent_given=request.POST.get('consent_given') == 'true'
+        )
+        
+        # Create background verification record
+        BackgroundVerification.objects.create(
+            counsellor=counsellor,
+            status='pending'
+        )
+        
+        store_registration_email(request, user.email)
+        send_verification_email(user)
+        
+        print(f"Counsellor account created successfully: {user.email}")
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Counsellor account created successfully. Please check your email for verification. Your account will be activated after background verification.',
+            'role': 'counsellor',
+            'email': user.email
+        })
+        
     except Exception as e:
         print(f"Error creating counsellor account: {str(e)}")
         return JsonResponse({
@@ -1246,8 +1282,3 @@ def login_view(request):
 #             'success': False,
 #             'error': 'Internal server error'
 #         }, status=500)
-
-
-
-
-

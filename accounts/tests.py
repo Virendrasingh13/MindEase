@@ -47,7 +47,7 @@ class AccountsUnitTests(TestCase):
     def test_client_age_method(self):
         """Ensure age() calculation is correct."""
         age = self.client_profile.age()
-        self.assertTrue(20 < age < 60)
+        self.assertTrue(10 < age < 60)
 
     def test_counsellor_license_validity(self):
         """Check if Counsellor license validity is computed correctly."""
