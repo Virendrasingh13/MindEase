@@ -17,6 +17,7 @@ All **78 test cases** were successfully executed and **passed across all 6 modul
 | 🔗 [Resources](https://drive.google.com/file/d/1K351qNabQdrUXXmobvwrJgDBcqDH7tKY/view?usp=sharing)    | Resource Listing, Filters, Sorting, Pagination                           |
 | 🔗 [Home](https://drive.google.com/file/d/1ZCkKxdCfmldFMWAxwiwMUfeJp_mgYIa9/view?usp=sharing)         | Landing Page Navigation & Rendering Checks                               |
 
+---
 
 ### **Execution Details**
 
@@ -26,8 +27,9 @@ All **78 test cases** were successfully executed and **passed across all 6 modul
 | Passed               | **78**                              |
 | Failed               | **0**                               |
 | Modules Covered      | **6**                               |
-| Final Result         | **✔ All tests passed successfully** |
+| Final Result         | **All tests passed successfully** |
 
+---
 
 ### Notes
 
