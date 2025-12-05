@@ -619,5 +619,3 @@ def resource_list(request):
 | `resources` | **Pipeline / Chain of Filters** | `resources/strategies/filtering.py` → `SearchFilter`, `TypeFilter`, `CategoryFilter`, `DifficultyFilter`; `resources/pipelines/filters_pipeline.py` → `FilterPipeline`                         | Applies a sequence of filters (search, type, category, difficulty) to the queryset in a clean, composable way.          |
 
 ---
-
-If you want, I can also give you **2–3 lines per pattern** that you can speak directly in your video (“I implemented the Factory pattern in accounts by…”, “In resources we used Strategy and a Filter Pipeline to…”).
